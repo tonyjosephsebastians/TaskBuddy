@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskBuddy Test Dashboard</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Segoe UI Variable Text", "Segoe UI", Aptos, sans-serif;
+      --bg: #f3f7fc;
+      --bg-strong: #e8f0fb;
+      --surface: rgba(255, 255, 255, 0.97);
+      --surface-strong: #ffffff;
+      --line: rgba(15, 58, 95, 0.12);
+      --text: #14385b;
+      --muted: #6782a0;
+      --navy: #0e416c;
+      --blue: #0f6eb4;
+      --green: #207a44;
+      --red: #c44d43;
+      --yellow: #a97816;
+      --shadow: 0 18px 40px rgba(13, 47, 82, 0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(157, 195, 234, 0.18), transparent 28%),
+        linear-gradient(180deg, #fbfdff 0%, var(--bg) 50%, #edf4fb 100%);
+    }
+    .shell {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 20px 36px;
+    }
+    .hero {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+    .hero__card,
+    .panel,
+    .results {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .hero__card {
+      padding: 24px;
+      background:
+        radial-gradient(circle at top right, rgba(177, 207, 242, 0.26), transparent 20%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(247, 251, 255, 0.98));
+    }
+    .hero__eyebrow {
+      margin: 0 0 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    h1, h2 { margin: 0; color: var(--navy); }
+    .hero__copy {
+      margin: 10px 0 0;
+      max-width: 56ch;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .summary-grid,
+    .suite-grid {
+      display: grid;
+      gap: 14px;
+    }
+    .summary-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .suite-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .metric-card {
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.96);
+    }
+    .metric-card strong {
+      display: block;
+      margin-top: 10px;
+      font-size: clamp(1.6rem, 2vw, 2rem);
+      color: var(--navy);
+    }
+    .metric-card p,
+    .metric-card__label,
+    .panel p,
+    .toolbar__meta,
+    td {
+      color: var(--muted);
+    }
+    .metric-card p {
+      margin: 8px 0 0;
+      line-height: 1.5;
+    }
+    .metric-card--compact strong {
+      margin-top: 8px;
+      font-size: 1.5rem;
+    }
+    .content-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .panel {
+      padding: 18px;
+    }
+    .panel__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .panel ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+    .panel li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(249, 252, 255, 0.98), rgba(245, 249, 255, 0.98));
+    }
+    .panel li span {
+      color: var(--text);
+      font-weight: 600;
+    }
+    .results {
+      overflow: hidden;
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 20px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(249, 252, 255, 0.98), rgba(243, 248, 255, 0.98));
+    }
+    .toolbar__meta {
+      margin-top: 6px;
+      font-size: 0.9rem;
+    }
+    input[type="search"] {
+      width: min(420px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 13px 14px;
+      background: var(--surface-strong);
+      font: inherit;
+      color: var(--text);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface-strong);
+    }
+    th, td {
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(15, 58, 95, 0.08);
+      vertical-align: top;
+      font-size: 0.92rem;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: rgba(237, 245, 255, 0.97);
+      color: var(--muted);
+      font-size: 0.76rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    tbody tr:hover {
+      background: rgba(244, 249, 255, 0.72);
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 78px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: capitalize;
+      border: 1px solid transparent;
+    }
+    .status-pill--passed {
+      color: var(--green);
+      background: rgba(223, 240, 221, 0.9);
+      border-color: rgba(32, 122, 68, 0.12);
+    }
+    .status-pill--failed {
+      color: var(--red);
+      background: rgba(255, 239, 236, 0.92);
+      border-color: rgba(196, 77, 67, 0.14);
+    }
+    .status-pill--skipped {
+      color: var(--yellow);
+      background: rgba(255, 244, 214, 0.92);
+      border-color: rgba(169, 120, 22, 0.12);
+    }
+    @media (max-width: 1080px) {
+      .summary-grid,
+      .suite-grid,
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+    @media (max-width: 760px) {
+      .shell {
+        padding: 18px 12px 24px;
+      }
+      .hero__card,
+      .panel,
+      .results {
+        border-radius: 22px;
+      }
+      th, td {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <article class="hero__card">
+        <p class="hero__eyebrow">TaskBuddy review pack</p>
+        <h1>Automated Test Dashboard</h1>
+        <p class="hero__copy">Backend and frontend verification results for the TaskBuddy coding challenge submission, including normalized coverage mapping, per-test descriptions, and searchable failure detail.</p>
+      </article>
+      <div class="summary-grid">
+        
+    <article class="metric-card">
+      <div class="metric-card__label">Total tests</div>
+      <strong>47</strong>
+      <p>Complete backend and frontend validation set</p>
+    </article>
+    
+
+    <article class="metric-card">
+      <div class="metric-card__label">Passed</div>
+      <strong>46</strong>
+      <p>Stable validations currently passing</p>
+    </article>
+    
+
+    <article class="metric-card">
+      <div class="metric-card__label">Failed</div>
+      <strong>1</strong>
+      <p>Tests that need reviewer attention</p>
+    </article>
+    
+
+    <article class="metric-card">
+      <div class="metric-card__label">Skipped</div>
+      <strong>0</strong>
+      <p>Cases intentionally or conditionally skipped</p>
+    </article>
+    
+      </div>
+    </section>
+
+    <section class="content-grid">
+      <article class="panel">
+        <div class="panel__header">
+          <div>
+            <h2>Suite Breakdown</h2>
+            <p>High-level view of backend and frontend validation results.</p>
+          </div>
+        </div>
+        <div class="suite-grid">
+          
+        <article class="metric-card metric-card--compact">
+          <div class="metric-card__label">backend</div>
+          <strong>36</strong>
+          <p>36 passed &bull; 0 failed &bull; 0 skipped</p>
+        </article>
+        
+
+        <article class="metric-card metric-card--compact">
+          <div class="metric-card__label">frontend</div>
+          <strong>11</strong>
+          <p>10 passed &bull; 1 failed &bull; 0 skipped</p>
+        </article>
+        
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel__header">
+          <div>
+            <h2>Coverage Areas</h2>
+            <p>Normalized challenge coverage labels used in the export outputs.</p>
+          </div>
+        </div>
+        <ul><li><span>Validation</span><strong>12</strong></li>
+<li><span>RBAC</span><strong>7</strong></li>
+<li><span>Tool execution</span><strong>7</strong></li>
+<li><span>Threaded chat</span><strong>6</strong></li>
+<li><span>Core challenge</span><strong>6</strong></li>
+<li><span>Persistence</span><strong>5</strong></li>
+<li><span>Multi-step reasoning</span><strong>5</strong></li>
+<li><span>Execution trace</span><strong>5</strong></li>
+<li><span>Admin workflow</span><strong>4</strong></li>
+<li><span>Streaming</span><strong>4</strong></li>
+<li><span>Error handling</span><strong>3</strong></li>
+<li><span>Unsupported task UX</span><strong>3</strong></li>
+<li><span>Retry logic</span><strong>3</strong></li>
+<li><span>Planning</span><strong>3</strong></li>
+<li><span>Text tool</span><strong>3</strong></li>
+<li><span>Safety</span><strong>3</strong></li>
+<li><span>Frontend workspace</span><strong>3</strong></li>
+<li><span>Calculator tool</span><strong>2</strong></li>
+<li><span>Weather tool</span><strong>2</strong></li>
+<li><span>Currency tool</span><strong>2</strong></li>
+<li><span>Transaction categorizer</span><strong>2</strong></li>
+<li><span>Frontend streaming</span><strong>2</strong></li>
+<li><span>Composer validation</span><strong>2</strong></li>
+<li><span>Frontend routing</span><strong>2</strong></li>
+<li><span>Frontend admin</span><strong>2</strong></li>
+<li><span>Core API</span><strong>1</strong></li>
+<li><span>Health endpoint</span><strong>1</strong></li>
+<li><span>Authentication</span><strong>1</strong></li>
+<li><span>User management</span><strong>1</strong></li>
+<li><span>History search</span><strong>1</strong></li>
+<li><span>Deletion</span><strong>1</strong></li>
+<li><span>Tool routing</span><strong>1</strong></li>
+<li><span>Setup</span><strong>1</strong></li>
+<li><span>Frontend login</span><strong>1</strong></li>
+<li><span>Authentication UX</span><strong>1</strong></li>
+<li><span>Response hierarchy</span><strong>1</strong></li>
+<li><span>Fallback behavior</span><strong>1</strong></li>
+<li><span>History sidebar</span><strong>1</strong></li></ul>
+      </article>
+    </section>
+
+    <section class="results">
+      <div class="toolbar">
+        <div>
+          <h2>Detailed Results</h2>
+          <p class="toolbar__meta">Search by suite, class, test name, description, or coverage area.</p>
+        </div>
+        <input id="search" type="search" placeholder="Search tests, descriptions, or coverage..." />
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Suite</th>
+            <th>Class</th>
+            <th>Test</th>
+            <th>Description</th>
+            <th>Coverage</th>
+            <th>Status</th>
+            <th>Time</th>
+            <th>Failure / Notes</th>
+          </tr>
+        </thead>
+        <tbody id="results-table">
+          
+        <tr data-search="backend tests.integration.test_api test_health_endpoint health check responds successfully without requiring authentication. core api health endpoint">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_health_endpoint</td>
+          <td>Health check responds successfully without requiring authentication.</td>
+          <td>Core API, Health endpoint</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.779</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_auth_flow_and_me_endpoint login creates an authenticated session and the current-user endpoint returns the signed-in account. authentication rbac">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_auth_flow_and_me_endpoint</td>
+          <td>Login creates an authenticated session and the current-user endpoint returns the signed-in account.</td>
+          <td>Authentication, RBAC</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.758</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_admin_can_create_user_and_user_cannot_access_admin_route admin users can manage local accounts while standard users are blocked from admin-only routes. admin workflow rbac user management">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_admin_can_create_user_and_user_cannot_access_admin_route</td>
+          <td>Admin users can manage local accounts while standard users are blocked from admin-only routes.</td>
+          <td>Admin workflow, RBAC, User management</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>1.360</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_threads_append_turns_and_support_search thread history stores multiple turns and remains searchable by prompt content. threaded chat persistence history search">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_threads_append_turns_and_support_search</td>
+          <td>Thread history stores multiple turns and remains searchable by prompt content.</td>
+          <td>Threaded chat, Persistence, History search</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>1.416</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_thread_can_be_deleted deleting a thread removes its stored turns and hides it from history. threaded chat persistence deletion">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_thread_can_be_deleted</td>
+          <td>Deleting a thread removes its stored turns and hides it from history.</td>
+          <td>Threaded chat, Persistence, Deletion</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>1.338</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_supports_two_subtasks_in_one_request the task api supports up to two subtasks in one request and returns combined multi-tool output. multi-step reasoning tool execution core challenge">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_supports_two_subtasks_in_one_request</td>
+          <td>The task API supports up to two subtasks in one request and returns combined multi-tool output.</td>
+          <td>Multi-step reasoning, Tool execution, Core challenge</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.827</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_rejects_more_than_two_subtasks requests containing more than two subtasks are rejected with a validation error. validation core challenge">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_rejects_more_than_two_subtasks</td>
+          <td>Requests containing more than two subtasks are rejected with a validation error.</td>
+          <td>Validation, Core challenge</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>1.011</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_returns_handled_response_for_unsupported_tasks unsupported requests are returned as handled task results instead of crashing the api. error handling unsupported task ux">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_returns_handled_response_for_unsupported_tasks</td>
+          <td>Unsupported requests are returned as handled task results instead of crashing the API.</td>
+          <td>Error handling, Unsupported task UX</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.900</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_streams_trace_steps_and_returns_completed_thread streaming execution emits ordered trace events and finishes with the persisted thread payload. streaming execution trace persistence">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_streams_trace_steps_and_returns_completed_thread</td>
+          <td>Streaming execution emits ordered trace events and finishes with the persisted thread payload.</td>
+          <td>Streaming, Execution trace, Persistence</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.696</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_streams_handled_unsupported_task_turn streaming execution returns a completed unsupported-task turn rather than failing the stream. streaming unsupported task ux">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_streams_handled_unsupported_task_turn</td>
+          <td>Streaming execution returns a completed unsupported-task turn rather than failing the stream.</td>
+          <td>Streaming, Unsupported task UX</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.611</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_streams_visible_retry_before_success streaming execution surfaces retry scheduling before completing successfully after a transient tool failure. streaming retry logic execution trace">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_streams_visible_retry_before_success</td>
+          <td>Streaming execution surfaces retry scheduling before completing successfully after a transient tool failure.</td>
+          <td>Streaming, Retry logic, Execution trace</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.993</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_interpreter_routes_all_primary_tools interpreter routing selects the correct primary tool for each supported request family. tool routing core challenge">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_routes_all_primary_tools</td>
+          <td>Interpreter routing selects the correct primary tool for each supported request family.</td>
+          <td>Tool routing, Core challenge</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.002</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_interpreter_builds_two_step_transaction_and_currency_plan interpreter builds the chained categorization-to-currency plan for supported finance prompts. multi-step reasoning planning">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_builds_two_step_transaction_and_currency_plan</td>
+          <td>Interpreter builds the chained categorization-to-currency plan for supported finance prompts.</td>
+          <td>Multi-step reasoning, Planning</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_interpreter_builds_two_independent_subtasks_from_natural_language interpreter splits supported natural-language requests into two independent tool steps. multi-step reasoning planning">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_builds_two_independent_subtasks_from_natural_language</td>
+          <td>Interpreter splits supported natural-language requests into two independent tool steps.</td>
+          <td>Multi-step reasoning, Planning</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_interpreter_supports_unquoted_text_task_in_multi_subtask_mode interpreter accepts unquoted text transforms inside a two-subtask request. multi-step reasoning text tool">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_supports_unquoted_text_task_in_multi_subtask_mode</td>
+          <td>Interpreter accepts unquoted text transforms inside a two-subtask request.</td>
+          <td>Multi-step reasoning, Text tool</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.002</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_interpreter_rejects_more_than_two_subtasks interpreter enforces the maximum of two subtasks per request. validation planning">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_rejects_more_than_two_subtasks</td>
+          <td>Interpreter enforces the maximum of two subtasks per request.</td>
+          <td>Validation, Planning</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_controller_combines_multi_subtask_results controller combines multiple tool outputs into one ordered final response payload. execution trace multi-step reasoning core challenge">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_controller_combines_multi_subtask_results</td>
+          <td>Controller combines multiple tool outputs into one ordered final response payload.</td>
+          <td>Execution trace, Multi-step reasoning, Core challenge</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_controller_returns_handled_unsupported_turn controller converts unsupported requests into handled thread turns with response assembly steps. error handling unsupported task ux">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_controller_returns_handled_unsupported_turn</td>
+          <td>Controller converts unsupported requests into handled thread turns with response assembly steps.</td>
+          <td>Error handling, Unsupported task UX</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_controller_retries_retryable_tool_failures_once controller retries a retryable tool failure once and records the retry step in the trace. retry logic execution trace">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_controller_retries_retryable_tool_failures_once</td>
+          <td>Controller retries a retryable tool failure once and records the retry step in the trace.</td>
+          <td>Retry logic, Execution trace</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_controller_returns_failed_turn_when_retryable_error_keeps_failing controller returns a handled failed turn when a retryable tool error still fails after the retry limit. retry logic error handling">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_controller_returns_failed_turn_when_retryable_error_keeps_failing</td>
+          <td>Controller returns a handled failed turn when a retryable tool error still fails after the retry limit.</td>
+          <td>Retry logic, Error handling</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.002</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_repository_seeds_default_users repository initialization seeds only the documented bootstrap admin account. rbac persistence setup">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_repository_seeds_default_users</td>
+          <td>Repository initialization seeds only the documented bootstrap admin account.</td>
+          <td>RBAC, Persistence, Setup</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.654</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_thread_persists_masked_turns_and_auto_titles repository persists masked turn content and auto-generates thread titles from the first task. persistence safety threaded chat">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_thread_persists_masked_turns_and_auto_titles</td>
+          <td>Repository persists masked turn content and auto-generates thread titles from the first task.</td>
+          <td>Persistence, Safety, Threaded chat</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.553</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_repository_enforces_password_policy_for_created_users repository rejects new users whose passwords do not meet the documented policy. admin workflow validation rbac">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_repository_enforces_password_policy_for_created_users</td>
+          <td>Repository rejects new users whose passwords do not meet the documented policy.</td>
+          <td>Admin workflow, Validation, RBAC</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.623</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_repository_enforces_role_limits_for_created_users repository enforces the configured maximum number of admin and standard user accounts. admin workflow rbac validation">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_repository_enforces_role_limits_for_created_users</td>
+          <td>Repository enforces the configured maximum number of admin and standard user accounts.</td>
+          <td>Admin workflow, RBAC, Validation</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.720</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_safety test_safety_guard_rejects_more_than_two_hundred_fifty_characters safety guard rejects input longer than the documented 250 character limit. safety validation">
+          <td>backend</td>
+          <td>tests.unit.test_safety</td>
+          <td>test_safety_guard_rejects_more_than_two_hundred_fifty_characters</td>
+          <td>Safety guard rejects input longer than the documented 250 character limit.</td>
+          <td>Safety, Validation</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.002</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_safety test_safety_guard_accepts_exactly_two_hundred_fifty_characters safety guard accepts input that is exactly at the documented character limit. safety validation">
+          <td>backend</td>
+          <td>tests.unit.test_safety</td>
+          <td>test_safety_guard_accepts_exactly_two_hundred_fifty_characters</td>
+          <td>Safety guard accepts input that is exactly at the documented character limit.</td>
+          <td>Safety, Validation</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_tools test_text_processor_uppercase text processor returns uppercase output for supported requests. text tool tool execution">
+          <td>backend</td>
+          <td>tests.unit.test_tools</td>
+          <td>test_text_processor_uppercase</td>
+          <td>Text processor returns uppercase output for supported requests.</td>
+          <td>Text tool, Tool execution</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_tools test_text_processor_missing_text text processor rejects requests that omit the required text target. text tool validation">
+          <td>backend</td>
+          <td>tests.unit.test_tools</td>
+          <td>test_text_processor_missing_text</td>
+          <td>Text processor rejects requests that omit the required text target.</td>
+          <td>Text tool, Validation</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_tools test_calculator_precedence calculator preserves arithmetic precedence and parentheses order. calculator tool tool execution">
+          <td>backend</td>
+          <td>tests.unit.test_tools</td>
+          <td>test_calculator_precedence</td>
+          <td>Calculator preserves arithmetic precedence and parentheses order.</td>
+          <td>Calculator tool, Tool execution</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.002</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_tools test_calculator_divide_by_zero calculator rejects divide-by-zero expressions safely. calculator tool validation">
+          <td>backend</td>
+          <td>tests.unit.test_tools</td>
+          <td>test_calculator_divide_by_zero</td>
+          <td>Calculator rejects divide-by-zero expressions safely.</td>
+          <td>Calculator tool, Validation</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.002</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_tools test_weather_city_is_case_insensitive weather tool matches supported cities without case sensitivity. weather tool tool execution">
+          <td>backend</td>
+          <td>tests.unit.test_tools</td>
+          <td>test_weather_city_is_case_insensitive</td>
+          <td>Weather tool matches supported cities without case sensitivity.</td>
+          <td>Weather tool, Tool execution</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.002</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_tools test_weather_rejects_unsupported_city weather tool returns a validation error when the city is outside the supported mock list. weather tool validation">
+          <td>backend</td>
+          <td>tests.unit.test_tools</td>
+          <td>test_weather_rejects_unsupported_city</td>
+          <td>Weather tool returns a validation error when the city is outside the supported mock list.</td>
+          <td>Weather tool, Validation</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_tools test_currency_converter_converts_between_supported_codes currency converter returns the expected converted amount for supported codes. currency tool tool execution">
+          <td>backend</td>
+          <td>tests.unit.test_tools</td>
+          <td>test_currency_converter_converts_between_supported_codes</td>
+          <td>Currency converter returns the expected converted amount for supported codes.</td>
+          <td>Currency tool, Tool execution</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_tools test_currency_converter_rejects_negative_amount currency converter rejects negative amounts. currency tool validation">
+          <td>backend</td>
+          <td>tests.unit.test_tools</td>
+          <td>test_currency_converter_rejects_negative_amount</td>
+          <td>Currency converter rejects negative amounts.</td>
+          <td>Currency tool, Validation</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_tools test_transaction_categorizer_matches_keywords transaction categorizer matches merchant keywords to the expected spending category. transaction categorizer tool execution">
+          <td>backend</td>
+          <td>tests.unit.test_tools</td>
+          <td>test_transaction_categorizer_matches_keywords</td>
+          <td>Transaction categorizer matches merchant keywords to the expected spending category.</td>
+          <td>Transaction categorizer, Tool execution</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_tools test_transaction_categorizer_falls_back_to_other transaction categorizer falls back to the generic other category when no keyword matches. transaction categorizer tool execution">
+          <td>backend</td>
+          <td>tests.unit.test_tools</td>
+          <td>test_transaction_categorizer_falls_back_to_other</td>
+          <td>Transaction categorizer falls back to the generic other category when no keyword matches.</td>
+          <td>Transaction categorizer, Tool execution</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.002</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; renders the login page and signs in to the workspace login renders the branded sign-in flow and transitions into the authenticated workspace shell. frontend login authentication ux">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; renders the login page and signs in to the workspace</td>
+          <td>Login renders the branded sign-in flow and transitions into the authenticated workspace shell.</td>
+          <td>Frontend login, Authentication UX</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.3286077</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; creates a new chat and renders the response card hierarchy submitting a task creates a new chat and renders the final-output-first response card layout. frontend workspace core challenge response hierarchy">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; creates a new chat and renders the response card hierarchy</td>
+          <td>Submitting a task creates a new chat and renders the final-output-first response card layout.</td>
+          <td>Frontend workspace, Core challenge, Response hierarchy</td>
+          <td><span class="status-pill status-pill--failed">failed</span></td>
+          <td>0.2722468</td>
+          <td>expected &#x27;/&#x27; to be &#x27;/threads/thread-2&#x27; // Object.is equality AssertionError: expected &#x27;/&#x27; to be &#x27;/threads/thread-2&#x27; // Object.is equality
+
+Expected: &quot;/threads/thread-2&quot;
+Received: &quot;/&quot;
+
+ ❯ src/App.test.tsx:332:38</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; renders streamed execution trace steps before completion the workspace shows streamed trace steps live before the final persisted turn replaces the pending card. frontend streaming execution trace streaming">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; renders streamed execution trace steps before completion</td>
+          <td>The workspace shows streamed trace steps live before the final persisted turn replaces the pending card.</td>
+          <td>Frontend streaming, Execution trace, Streaming</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.3667808</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; falls back to synchronous submission when streaming is unavailable the frontend falls back to the synchronous task endpoint when streaming cannot be established. frontend streaming fallback behavior">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; falls back to synchronous submission when streaming is unavailable</td>
+          <td>The frontend falls back to the synchronous task endpoint when streaming cannot be established.</td>
+          <td>Frontend streaming, Fallback behavior</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.1741088</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; collapses and expands the history panel from the rail the left rail toggle collapses and re-expands the thread history panel without breaking workspace access. frontend workspace history sidebar">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; collapses and expands the history panel from the rail</td>
+          <td>The left rail toggle collapses and re-expands the thread history panel without breaking workspace access.</td>
+          <td>Frontend workspace, History sidebar</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.1000948</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; shows inline composer validation for too many subtasks composer validation appears inline when a request exceeds the two-subtask limit. composer validation core challenge">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; shows inline composer validation for too many subtasks</td>
+          <td>Composer validation appears inline when a request exceeds the two-subtask limit.</td>
+          <td>Composer validation, Core challenge</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.0771534</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; loads direct thread routes and redirects missing threads home direct thread urls resolve to a saved chat or redirect back to the home workspace when the thread is missing. frontend routing threaded chat validation">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; loads direct thread routes and redirects missing threads home</td>
+          <td>Direct thread URLs resolve to a saved chat or redirect back to the home workspace when the thread is missing.</td>
+          <td>Frontend routing, Threaded chat, Validation</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.0705427</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; blocks creating a sixth thread from the sidebar the sidebar disables new chat creation when the user has already reached the five-thread limit. frontend workspace validation threaded chat">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; blocks creating a sixth thread from the sidebar</td>
+          <td>The sidebar disables new chat creation when the user has already reached the five-thread limit.</td>
+          <td>Frontend workspace, Validation, Threaded chat</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.1135684</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; blocks submissions when a chat already has three task flows the composer is disabled when the selected chat already contains three saved task flows. composer validation threaded chat frontend routing">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; blocks submissions when a chat already has three task flows</td>
+          <td>The composer is disabled when the selected chat already contains three saved task flows.</td>
+          <td>Composer validation, Threaded chat, Frontend routing</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.1372259</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; navigates to the admin page and reveals passwords only for session-created users admins can open the admin page, create users, reveal passwords only for users created in the current session, and delete those users. admin workflow rbac frontend admin">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; navigates to the admin page and reveals passwords only for session-created users</td>
+          <td>Admins can open the admin page, create users, reveal passwords only for users created in the current session, and delete those users.</td>
+          <td>Admin workflow, RBAC, Frontend admin</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.4371495</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; keeps admin navigation hidden for standard users standard users do not see admin navigation controls in the workspace. rbac frontend admin">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; keeps admin navigation hidden for standard users</td>
+          <td>Standard users do not see admin navigation controls in the workspace.</td>
+          <td>RBAC, Frontend admin</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.0387839</td>
+          <td>-</td>
+        </tr>
+        
+        </tbody>
+      </table>
+    </section>
+  </div>
+  <script>
+    const searchBox = document.getElementById('search');
+    const rows = Array.from(document.querySelectorAll('#results-table tr'));
+    searchBox?.addEventListener('input', (event) => {
+      const query = String(event.target.value || '').toLowerCase().trim();
+      for (const row of rows) {
+        const haystack = row.getAttribute('data-search') || '';
+        row.style.display = !query || haystack.includes(query) ? '' : 'none';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+{
+  "tests.integration.test_api::test_health_endpoint": {
+    "description": "Health check responds successfully without requiring authentication.",
+    "coverage": ["Core API", "Health endpoint"]
+  },
+  "tests.integration.test_api::test_auth_flow_and_me_endpoint": {
+    "description": "Login creates an authenticated session and the current-user endpoint returns the signed-in account.",
+    "coverage": ["Authentication", "RBAC"]
+  },
+  "tests.integration.test_api::test_admin_can_create_user_and_user_cannot_access_admin_route": {
+    "description": "Admin users can manage local accounts while standard users are blocked from admin-only routes.",
+    "coverage": ["Admin workflow", "RBAC", "User management"]
+  },
+  "tests.integration.test_api::test_threads_append_turns_and_support_search": {
+    "description": "Thread history stores multiple turns and remains searchable by prompt content.",
+    "coverage": ["Threaded chat", "Persistence", "History search"]
+  },
+  "tests.integration.test_api::test_api_rejects_sixth_thread": {
+    "description": "Creating a sixth thread is rejected before persistence with the configured per-user chat limit.",
+    "coverage": ["Threaded chat", "Validation", "Persistence"]
+  },
+  "tests.integration.test_api::test_api_rejects_fourth_thread_flow_before_execution": {
+    "description": "Submitting a fourth saved task flow in one chat is rejected before task execution begins.",
+    "coverage": ["Threaded chat", "Validation", "Execution trace"]
+  },
+  "tests.integration.test_api::test_api_rejects_fourth_thread_flow_on_stream_route": {
+    "description": "The streaming task endpoint rejects a fourth task flow before opening an SSE execution stream.",
+    "coverage": ["Streaming", "Validation", "Threaded chat"]
+  },
+  "tests.integration.test_api::test_thread_can_be_deleted": {
+    "description": "Deleting a thread removes its stored turns and hides it from history.",
+    "coverage": ["Threaded chat", "Persistence", "Deletion"]
+  },
+  "tests.integration.test_api::test_api_supports_two_subtasks_in_one_request": {
+    "description": "The task API supports up to two subtasks in one request and returns combined multi-tool output.",
+    "coverage": ["Multi-step reasoning", "Tool execution", "Core challenge"]
+  },
+  "tests.integration.test_api::test_api_rejects_more_than_two_subtasks": {
+    "description": "Requests containing more than two subtasks are rejected with a validation error.",
+    "coverage": ["Validation", "Core challenge"]
+  },
+  "tests.integration.test_api::test_api_returns_handled_response_for_unsupported_tasks": {
+    "description": "Unsupported requests are returned as handled task results instead of crashing the API.",
+    "coverage": ["Error handling", "Unsupported task UX"]
+  },
+  "tests.integration.test_api::test_api_streams_trace_steps_and_returns_completed_thread": {
+    "description": "Streaming execution emits ordered trace events and finishes with the persisted thread payload.",
+    "coverage": ["Streaming", "Execution trace", "Persistence"]
+  },
+  "tests.integration.test_api::test_api_streams_handled_unsupported_task_turn": {
+    "description": "Streaming execution returns a completed unsupported-task turn rather than failing the stream.",
+    "coverage": ["Streaming", "Unsupported task UX"]
+  },
+  "tests.integration.test_api::test_api_streams_visible_retry_before_success": {
+    "description": "Streaming execution surfaces retry scheduling before completing successfully after a transient tool failure.",
+    "coverage": ["Streaming", "Retry logic", "Execution trace"]
+  },
+  "tests.unit.test_agent::test_interpreter_routes_all_primary_tools": {
+    "description": "Interpreter routing selects the correct primary tool for each supported request family.",
+    "coverage": ["Tool routing", "Core challenge"]
+  },
+  "tests.unit.test_agent::test_interpreter_builds_two_step_transaction_and_currency_plan": {
+    "description": "Interpreter builds the chained categorization-to-currency plan for supported finance prompts.",
+    "coverage": ["Multi-step reasoning", "Planning"]
+  },
+  "tests.unit.test_agent::test_interpreter_builds_two_independent_subtasks_from_natural_language": {
+    "description": "Interpreter splits supported natural-language requests into two independent tool steps.",
+    "coverage": ["Multi-step reasoning", "Planning"]
+  },
+  "tests.unit.test_agent::test_interpreter_supports_unquoted_text_task_in_multi_subtask_mode": {
+    "description": "Interpreter accepts unquoted text transforms inside a two-subtask request.",
+    "coverage": ["Multi-step reasoning", "Text tool"]
+  },
+  "tests.unit.test_agent::test_interpreter_rejects_more_than_two_subtasks": {
+    "description": "Interpreter enforces the maximum of two subtasks per request.",
+    "coverage": ["Validation", "Planning"]
+  },
+  "tests.unit.test_agent::test_controller_combines_multi_subtask_results": {
+    "description": "Controller combines multiple tool outputs into one ordered final response payload.",
+    "coverage": ["Execution trace", "Multi-step reasoning", "Core challenge"]
+  },
+  "tests.unit.test_agent::test_controller_returns_handled_unsupported_turn": {
+    "description": "Controller converts unsupported requests into handled thread turns with response assembly steps.",
+    "coverage": ["Error handling", "Unsupported task UX"]
+  },
+  "tests.unit.test_agent::test_controller_retries_retryable_tool_failures_once": {
+    "description": "Controller retries a retryable tool failure once and records the retry step in the trace.",
+    "coverage": ["Retry logic", "Execution trace"]
+  },
+  "tests.unit.test_agent::test_controller_returns_failed_turn_when_retryable_error_keeps_failing": {
+    "description": "Controller returns a handled failed turn when a retryable tool error still fails after the retry limit.",
+    "coverage": ["Retry logic", "Error handling"]
+  },
+  "tests.unit.test_agent::test_repository_seeds_default_users": {
+    "description": "Repository initialization seeds only the documented bootstrap admin account.",
+    "coverage": ["RBAC", "Persistence", "Setup"]
+  },
+  "tests.unit.test_agent::test_thread_persists_masked_turns_and_auto_titles": {
+    "description": "Repository persists masked turn content and auto-generates thread titles from the first task.",
+    "coverage": ["Persistence", "Safety", "Threaded chat"]
+  },
+  "tests.unit.test_agent::test_repository_enforces_password_policy_for_created_users": {
+    "description": "Repository rejects new users whose passwords do not meet the documented policy.",
+    "coverage": ["Admin workflow", "Validation", "RBAC"]
+  },
+  "tests.unit.test_agent::test_repository_enforces_role_limits_for_created_users": {
+    "description": "Repository enforces the configured maximum number of admin and standard user accounts.",
+    "coverage": ["Admin workflow", "RBAC", "Validation"]
+  },
+  "tests.unit.test_agent::test_repository_enforces_thread_limit": {
+    "description": "Repository rejects a sixth chat thread for the same user.",
+    "coverage": ["Threaded chat", "Validation", "Persistence"]
+  },
+  "tests.unit.test_agent::test_repository_enforces_thread_flow_limit": {
+    "description": "Repository rejects a fourth saved task flow inside the same chat thread.",
+    "coverage": ["Threaded chat", "Validation", "Persistence"]
+  },
+  "tests.unit.test_tools::test_text_processor_uppercase": {
+    "description": "Text processor returns uppercase output for supported requests.",
+    "coverage": ["Text tool", "Tool execution"]
+  },
+  "tests.unit.test_tools::test_text_processor_missing_text": {
+    "description": "Text processor rejects requests that omit the required text target.",
+    "coverage": ["Text tool", "Validation"]
+  },
+  "tests.unit.test_tools::test_calculator_precedence": {
+    "description": "Calculator preserves arithmetic precedence and parentheses order.",
+    "coverage": ["Calculator tool", "Tool execution"]
+  },
+  "tests.unit.test_tools::test_calculator_divide_by_zero": {
+    "description": "Calculator rejects divide-by-zero expressions safely.",
+    "coverage": ["Calculator tool", "Validation"]
+  },
+  "tests.unit.test_tools::test_weather_city_is_case_insensitive": {
+    "description": "Weather tool matches supported cities without case sensitivity.",
+    "coverage": ["Weather tool", "Tool execution"]
+  },
+  "tests.unit.test_tools::test_weather_rejects_unsupported_city": {
+    "description": "Weather tool returns a validation error when the city is outside the supported mock list.",
+    "coverage": ["Weather tool", "Validation"]
+  },
+  "tests.unit.test_tools::test_currency_converter_converts_between_supported_codes": {
+    "description": "Currency converter returns the expected converted amount for supported codes.",
+    "coverage": ["Currency tool", "Tool execution"]
+  },
+  "tests.unit.test_tools::test_currency_converter_rejects_negative_amount": {
+    "description": "Currency converter rejects negative amounts.",
+    "coverage": ["Currency tool", "Validation"]
+  },
+  "tests.unit.test_tools::test_transaction_categorizer_matches_keywords": {
+    "description": "Transaction categorizer matches merchant keywords to the expected spending category.",
+    "coverage": ["Transaction categorizer", "Tool execution"]
+  },
+  "tests.unit.test_tools::test_transaction_categorizer_falls_back_to_other": {
+    "description": "Transaction categorizer falls back to the generic other category when no keyword matches.",
+    "coverage": ["Transaction categorizer", "Tool execution"]
+  },
+  "tests.unit.test_safety::test_safety_guard_rejects_more_than_two_hundred_fifty_characters": {
+    "description": "Safety guard rejects input longer than the documented 250 character limit.",
+    "coverage": ["Safety", "Validation"]
+  },
+  "tests.unit.test_safety::test_safety_guard_accepts_exactly_two_hundred_fifty_characters": {
+    "description": "Safety guard accepts input that is exactly at the documented character limit.",
+    "coverage": ["Safety", "Validation"]
+  }
+}

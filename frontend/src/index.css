@@ -1,0 +1,13 @@
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  color: #1b2d47;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}

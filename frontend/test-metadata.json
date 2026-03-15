@@ -1,0 +1,46 @@
+{
+  "src/App.test.tsx::App > renders the login page and signs in to the workspace": {
+    "description": "Login renders the branded sign-in flow and transitions into the authenticated workspace shell.",
+    "coverage": ["Frontend login", "Authentication UX"]
+  },
+  "src/App.test.tsx::App > creates a new chat and renders the response card hierarchy": {
+    "description": "Submitting a task creates a new chat and renders the final-output-first response card layout.",
+    "coverage": ["Frontend workspace", "Core challenge", "Response hierarchy"]
+  },
+  "src/App.test.tsx::App > renders streamed execution trace steps before completion": {
+    "description": "The workspace shows streamed trace steps live before the final persisted turn replaces the pending card.",
+    "coverage": ["Frontend streaming", "Execution trace", "Streaming"]
+  },
+  "src/App.test.tsx::App > falls back to synchronous submission when streaming is unavailable": {
+    "description": "The frontend falls back to the synchronous task endpoint when streaming cannot be established.",
+    "coverage": ["Frontend streaming", "Fallback behavior"]
+  },
+  "src/App.test.tsx::App > collapses and expands the history panel from the rail": {
+    "description": "The left rail toggle collapses and re-expands the thread history panel without breaking workspace access.",
+    "coverage": ["Frontend workspace", "History sidebar"]
+  },
+  "src/App.test.tsx::App > shows inline composer validation for too many subtasks": {
+    "description": "Composer validation appears inline when a request exceeds the two-subtask limit.",
+    "coverage": ["Composer validation", "Core challenge"]
+  },
+  "src/App.test.tsx::App > loads direct thread routes and redirects missing threads home": {
+    "description": "Direct thread URLs resolve to a saved chat or redirect back to the home workspace when the thread is missing.",
+    "coverage": ["Frontend routing", "Threaded chat", "Validation"]
+  },
+  "src/App.test.tsx::App > blocks creating a sixth thread from the sidebar": {
+    "description": "The sidebar disables new chat creation when the user has already reached the five-thread limit.",
+    "coverage": ["Frontend workspace", "Validation", "Threaded chat"]
+  },
+  "src/App.test.tsx::App > blocks submissions when a chat already has three task flows": {
+    "description": "The composer is disabled when the selected chat already contains three saved task flows.",
+    "coverage": ["Composer validation", "Threaded chat", "Frontend routing"]
+  },
+  "src/App.test.tsx::App > navigates to the admin page and reveals passwords only for session-created users": {
+    "description": "Admins can open the admin page, create users, reveal passwords only for users created in the current session, and delete those users.",
+    "coverage": ["Admin workflow", "RBAC", "Frontend admin"]
+  },
+  "src/App.test.tsx::App > keeps admin navigation hidden for standard users": {
+    "description": "Standard users do not see admin navigation controls in the workspace.",
+    "coverage": ["RBAC", "Frontend admin"]
+  }
+}

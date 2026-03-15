@@ -1,0 +1,11 @@
+services:
+  taskbuddy:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - taskbuddy_data:/app/backend/data
+
+volumes:
+  taskbuddy_data:
