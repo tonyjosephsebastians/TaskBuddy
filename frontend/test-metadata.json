@@ -7,6 +7,10 @@
     "description": "Submitting a task creates a new chat and renders the final-output-first response card layout.",
     "coverage": ["Frontend workspace", "Core challenge", "Response hierarchy"]
   },
+  "src/App.test.tsx::App > creates a chat from the home workspace on first submission and activates the thread route": {
+    "description": "Submitting the first task from workspace home creates a new chat and activates the thread route using the created thread payload.",
+    "coverage": ["Frontend routing", "Threaded chat", "Core challenge"]
+  },
   "src/App.test.tsx::App > renders streamed execution trace steps before completion": {
     "description": "The workspace shows streamed trace steps live before the final persisted turn replaces the pending card.",
     "coverage": ["Frontend streaming", "Execution trace", "Streaming"]
@@ -34,6 +38,10 @@
   "src/App.test.tsx::App > blocks submissions when a chat already has three task flows": {
     "description": "The composer is disabled when the selected chat already contains three saved task flows.",
     "coverage": ["Composer validation", "Threaded chat", "Frontend routing"]
+  },
+  "src/App.test.tsx::App > auto-scrolls the active thread when a later response is appended": {
+    "description": "The active chat auto-scrolls to the newest pending and completed content when a later response is appended in-session.",
+    "coverage": ["Frontend workspace", "Threaded chat", "Interaction polish"]
   },
   "src/App.test.tsx::App > navigates to the admin page and reveals passwords only for session-created users": {
     "description": "Admins can open the admin page, create users, reveal passwords only for users created in the current session, and delete those users.",

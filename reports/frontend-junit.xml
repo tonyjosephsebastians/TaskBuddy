@@ -1,35 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuites name="vitest tests" tests="11" failures="1" errors="0" time="2.1189912">
-    <testsuite name="src/App.test.tsx" timestamp="2026-03-15T19:01:40.294Z" hostname="LAPTOP-GGGNOCUI" tests="11" failures="1" errors="0" skipped="0" time="2.1189912">
-        <testcase classname="src/App.test.tsx" name="App &gt; renders the login page and signs in to the workspace" time="0.3286077">
+<testsuites name="vitest tests" tests="13" failures="0" errors="0" time="2.9969764">
+    <testsuite name="src/App.test.tsx" timestamp="2026-03-15T20:03:28.195Z" hostname="LAPTOP-GGGNOCUI" tests="13" failures="0" errors="0" skipped="0" time="2.9969764">
+        <testcase classname="src/App.test.tsx" name="App &gt; renders the login page and signs in to the workspace" time="0.3832605">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App &gt; creates a new chat and renders the response card hierarchy" time="0.2722468">
-            <failure message="expected &apos;/&apos; to be &apos;/threads/thread-2&apos; // Object.is equality" type="AssertionError">
-AssertionError: expected &apos;/&apos; to be &apos;/threads/thread-2&apos; // Object.is equality
-
-Expected: &quot;/threads/thread-2&quot;
-Received: &quot;/&quot;
-
- ❯ src/App.test.tsx:332:38
-            </failure>
+        <testcase classname="src/App.test.tsx" name="App &gt; creates a new chat and renders the response card hierarchy" time="0.3510417">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App &gt; renders streamed execution trace steps before completion" time="0.3667808">
+        <testcase classname="src/App.test.tsx" name="App &gt; creates a chat from the home workspace on first submission and activates the thread route" time="0.2013687">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App &gt; falls back to synchronous submission when streaming is unavailable" time="0.1741088">
+        <testcase classname="src/App.test.tsx" name="App &gt; renders streamed execution trace steps before completion" time="0.450278">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App &gt; collapses and expands the history panel from the rail" time="0.1000948">
+        <testcase classname="src/App.test.tsx" name="App &gt; falls back to synchronous submission when streaming is unavailable" time="0.1664482">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App &gt; shows inline composer validation for too many subtasks" time="0.0771534">
+        <testcase classname="src/App.test.tsx" name="App &gt; collapses and expands the history panel from the rail" time="0.1142635">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App &gt; loads direct thread routes and redirects missing threads home" time="0.0705427">
+        <testcase classname="src/App.test.tsx" name="App &gt; shows inline composer validation for too many subtasks" time="0.0807562">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App &gt; blocks creating a sixth thread from the sidebar" time="0.1135684">
+        <testcase classname="src/App.test.tsx" name="App &gt; loads direct thread routes and redirects missing threads home" time="0.0572637">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App &gt; blocks submissions when a chat already has three task flows" time="0.1372259">
+        <testcase classname="src/App.test.tsx" name="App &gt; blocks creating a sixth thread from the sidebar" time="0.1084234">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App &gt; navigates to the admin page and reveals passwords only for session-created users" time="0.4371495">
+        <testcase classname="src/App.test.tsx" name="App &gt; blocks submissions when a chat already has three task flows" time="0.1285028">
         </testcase>
-        <testcase classname="src/App.test.tsx" name="App &gt; keeps admin navigation hidden for standard users" time="0.0387839">
+        <testcase classname="src/App.test.tsx" name="App &gt; auto-scrolls the active thread when a later response is appended" time="0.2167385">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="App &gt; navigates to the admin page and reveals passwords only for session-created users" time="0.6857964">
+        </testcase>
+        <testcase classname="src/App.test.tsx" name="App &gt; keeps admin navigation hidden for standard users" time="0.0477441">
         </testcase>
     </testsuite>
 </testsuites>

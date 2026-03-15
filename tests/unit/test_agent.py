@@ -19,6 +19,30 @@ def test_interpreter_routes_all_primary_tools():
     assert interpreter.interpret("Categorize Starbucks transaction", "Categorize Starbucks transaction").steps[0].tool_name == "TransactionCategorizerTool"
 
 
+def test_interpreter_routes_supported_synonym_prompts():
+    interpreter = TaskInterpreter()
+
+    word_count_step = interpreter.interpret('Count the word "test"', 'Count the word "test"').steps[0]
+    assert word_count_step.tool_name == "TextProcessorTool"
+    assert word_count_step.params == {"operation": "word_count", "text": "test"}
+
+    calculator_step = interpreter.interpret("What is 8 minus 3?", "What is 8 minus 3?").steps[0]
+    assert calculator_step.tool_name == "CalculatorTool"
+    assert calculator_step.params == {"expression": "8 - 3"}
+
+    weather_step = interpreter.interpret("Forecast for London", "Forecast for London").steps[0]
+    assert weather_step.tool_name == "WeatherMockTool"
+    assert weather_step.params == {"city": "london"}
+
+    currency_step = interpreter.interpret("Exchange 15 USD to CAD", "Exchange 15 USD to CAD").steps[0]
+    assert currency_step.tool_name == "CurrencyConverterTool"
+    assert currency_step.params == {"amount": "15", "from_currency": "USD", "to_currency": "CAD"}
+
+    transaction_step = interpreter.interpret("Classify Starbucks spend", "Classify Starbucks spend").steps[0]
+    assert transaction_step.tool_name == "TransactionCategorizerTool"
+    assert transaction_step.params == {"description": "Starbucks", "amount": None}
+
+
 def test_interpreter_builds_two_step_transaction_and_currency_plan():
     interpreter = TaskInterpreter()
     parsed = interpreter.interpret(
@@ -74,6 +98,16 @@ def test_controller_combines_multi_subtask_results():
     assert len(execution.output_data["results"]) == 2
 
 
+def test_controller_counts_words_for_count_the_word_prompt():
+    controller = AgentController()
+    execution = controller.execute_task('Count the word "test"', trace_id="trace-word-count")
+
+    assert execution.status == "completed"
+    assert execution.tools_used == ["TextProcessorTool"]
+    assert execution.final_output == "1"
+    assert execution.output_data == {"operation": "word_count", "input": "test", "result": 1}
+
+
 def test_controller_returns_handled_unsupported_turn():
     controller = AgentController()
     execution = controller.execute_task("Summarize the latest stock market news", trace_id="trace-789")
@@ -82,6 +116,15 @@ def test_controller_returns_handled_unsupported_turn():
     assert execution.final_output == "TaskBuddy could not match this request to a supported tool."
     assert execution.tools_used == []
     assert execution.execution_steps[-1].phase == "response_assembly"
+
+
+def test_controller_returns_handled_unsupported_turn_for_occurrence_count_prompt():
+    controller = AgentController()
+    execution = controller.execute_task('Count occurrences of "test" in "test test"', trace_id="trace-occurrence")
+
+    assert execution.status == "unsupported"
+    assert execution.final_output == "TaskBuddy could not match this request to a supported tool."
+    assert execution.tools_used == []
 
 
 def test_controller_retries_retryable_tool_failures_once():

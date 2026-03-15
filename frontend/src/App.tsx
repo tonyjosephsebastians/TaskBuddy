@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useEffectEvent, useMemo, useState } from 'react'
+import { useDeferredValue, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import {
   AlertCircle,
@@ -799,6 +799,7 @@ function Sidebar({
 }
 
 function WorkspaceView({
+  autoScrollRequestId,
   composerError,
   composerDisabledReason,
   composerValue,
@@ -809,6 +810,7 @@ function WorkspaceView({
   pendingTurn,
   selectedThread,
 }: {
+  autoScrollRequestId: number
   composerError: string
   composerDisabledReason: string
   composerValue: string
@@ -824,6 +826,7 @@ function WorkspaceView({
   const remainingCharacters = MAX_COMPOSER_CHARACTERS - composerValue.length
   const composerValidation = getComposerValidation(composerValue)
   const visibleComposerError = composerDisabledReason || composerError || composerValidation
+  const bottomSentinelRef = useRef<HTMLDivElement | null>(null)
   const helperMetaText =
     remainingCharacters >= 0
       ? `${remainingCharacters} characters left \u2022 Up to 2 subtasks`
@@ -837,6 +840,13 @@ function WorkspaceView({
 
   */
 
+  useEffect(() => {
+    if (autoScrollRequestId === 0) {
+      return
+    }
+    bottomSentinelRef.current?.scrollIntoView({ block: 'end' })
+  }, [autoScrollRequestId])
+
   return (
     <section className="page-shell page-shell--workspace">
       <div className="workspace-stage">
@@ -847,6 +857,7 @@ function WorkspaceView({
                 <TurnCard key={turn.turn_id} turn={turn} />
               ))}
               {pendingTurn ? <PendingTurnCard pendingTurn={pendingTurn} /> : null}
+              <div ref={bottomSentinelRef} className="turn-stack__sentinel" aria-hidden="true" />
             </div>
           ) : (
             <div className="empty-state">
@@ -1258,6 +1269,7 @@ function App() {
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
   const [sessionPasswords, setSessionPasswords] = useState<Record<string, string>>({})
   const [passwordVisibility, setPasswordVisibility] = useState<Record<string, boolean>>({})
+  const [autoScrollRequestId, setAutoScrollRequestId] = useState(0)
 
   const groupedThreads = useMemo(() => groupThreads(threads), [threads])
   const isThreadLimitReached = totalThreadCount >= MAX_THREADS_PER_USER
@@ -1341,6 +1353,10 @@ function App() {
     setRoute(nextRoute)
   }
 
+  function requestAutoScroll() {
+    setAutoScrollRequestId((current) => current + 1)
+  }
+
   function resetSession() {
     setSessionStatus('unauthenticated')
     setCurrentUser(null)
@@ -1356,6 +1372,7 @@ function App() {
     setAdminNotice('')
     setSessionPasswords({})
     setPasswordVisibility({})
+    setAutoScrollRequestId(0)
   }
 
   async function initializeSession() {
@@ -1576,6 +1593,7 @@ function App() {
         tools_used: mergePendingToolLabels(current.tools_used, event.step),
       }
     })
+    requestAutoScroll()
   }
 
   async function persistCompletedStream(event: StreamCompletedEvent) {
@@ -1585,6 +1603,7 @@ function App() {
     setThreads(refreshedThreads)
     setComposerValue('')
     navigate({ kind: 'thread', threadId: event.thread.thread_id }, true)
+    requestAutoScroll()
   }
 
   async function handleSubmitTask(event: FormEvent<HTMLFormElement>) {
@@ -1636,6 +1655,7 @@ function App() {
         tools_used: [],
         trace_id: '',
       })
+      requestAutoScroll()
 
       try {
         const completedEvent = await createTurnStream(
@@ -1658,6 +1678,7 @@ function App() {
           setThreads(refreshedThreads)
           setComposerValue('')
           navigate({ kind: 'thread', threadId: thread.thread_id }, true)
+          requestAutoScroll()
         } else {
           throw error
         }
@@ -1827,6 +1848,7 @@ function App() {
           />
         ) : (
           <WorkspaceView
+            autoScrollRequestId={autoScrollRequestId}
             composerError={composerError}
             composerDisabledReason={composerDisabledReason}
             composerValue={composerValue}

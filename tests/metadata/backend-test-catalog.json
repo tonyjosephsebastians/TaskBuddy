@@ -59,6 +59,10 @@
     "description": "Interpreter routing selects the correct primary tool for each supported request family.",
     "coverage": ["Tool routing", "Core challenge"]
   },
+  "tests.unit.test_agent::test_interpreter_routes_supported_synonym_prompts": {
+    "description": "Interpreter recognizes the documented natural-language synonym prompts for text, calculator, weather, currency, and transaction tools.",
+    "coverage": ["Tool routing", "Core challenge", "Validation"]
+  },
   "tests.unit.test_agent::test_interpreter_builds_two_step_transaction_and_currency_plan": {
     "description": "Interpreter builds the chained categorization-to-currency plan for supported finance prompts.",
     "coverage": ["Multi-step reasoning", "Planning"]
@@ -79,9 +83,17 @@
     "description": "Controller combines multiple tool outputs into one ordered final response payload.",
     "coverage": ["Execution trace", "Multi-step reasoning", "Core challenge"]
   },
+  "tests.unit.test_agent::test_controller_counts_words_for_count_the_word_prompt": {
+    "description": "Controller treats count-the-word prompts as supported text word-count requests and returns the expected completed output.",
+    "coverage": ["Text tool", "Core challenge", "Tool routing"]
+  },
   "tests.unit.test_agent::test_controller_returns_handled_unsupported_turn": {
     "description": "Controller converts unsupported requests into handled thread turns with response assembly steps.",
     "coverage": ["Error handling", "Unsupported task UX"]
+  },
+  "tests.unit.test_agent::test_controller_returns_handled_unsupported_turn_for_occurrence_count_prompt": {
+    "description": "Controller keeps substring or occurrence-count wording unsupported and returns a handled unsupported-task turn.",
+    "coverage": ["Text tool", "Unsupported task UX", "Validation"]
   },
   "tests.unit.test_agent::test_controller_retries_retryable_tool_failures_once": {
     "description": "Controller retries a retryable tool failure once and records the retry step in the trace.",

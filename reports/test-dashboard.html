@@ -258,21 +258,21 @@
         
     <article class="metric-card">
       <div class="metric-card__label">Total tests</div>
-      <strong>47</strong>
+      <strong>60</strong>
       <p>Complete backend and frontend validation set</p>
     </article>
     
 
     <article class="metric-card">
       <div class="metric-card__label">Passed</div>
-      <strong>46</strong>
+      <strong>60</strong>
       <p>Stable validations currently passing</p>
     </article>
     
 
     <article class="metric-card">
       <div class="metric-card__label">Failed</div>
-      <strong>1</strong>
+      <strong>0</strong>
       <p>Tests that need reviewer attention</p>
     </article>
     
@@ -298,15 +298,15 @@
           
         <article class="metric-card metric-card--compact">
           <div class="metric-card__label">backend</div>
-          <strong>36</strong>
-          <p>36 passed &bull; 0 failed &bull; 0 skipped</p>
+          <strong>47</strong>
+          <p>47 passed &bull; 0 failed &bull; 0 skipped</p>
         </article>
         
 
         <article class="metric-card metric-card--compact">
           <div class="metric-card__label">frontend</div>
-          <strong>11</strong>
-          <p>10 passed &bull; 1 failed &bull; 0 skipped</p>
+          <strong>13</strong>
+          <p>13 passed &bull; 0 failed &bull; 0 skipped</p>
         </article>
         
         </div>
@@ -319,30 +319,31 @@
             <p>Normalized challenge coverage labels used in the export outputs.</p>
           </div>
         </div>
-        <ul><li><span>Validation</span><strong>12</strong></li>
+        <ul><li><span>Validation</span><strong>19</strong></li>
+<li><span>Threaded chat</span><strong>13</strong></li>
+<li><span>Core challenge</span><strong>9</strong></li>
+<li><span>Persistence</span><strong>8</strong></li>
 <li><span>RBAC</span><strong>7</strong></li>
 <li><span>Tool execution</span><strong>7</strong></li>
-<li><span>Threaded chat</span><strong>6</strong></li>
-<li><span>Core challenge</span><strong>6</strong></li>
-<li><span>Persistence</span><strong>5</strong></li>
+<li><span>Execution trace</span><strong>6</strong></li>
+<li><span>Streaming</span><strong>5</strong></li>
 <li><span>Multi-step reasoning</span><strong>5</strong></li>
-<li><span>Execution trace</span><strong>5</strong></li>
+<li><span>Text tool</span><strong>5</strong></li>
 <li><span>Admin workflow</span><strong>4</strong></li>
-<li><span>Streaming</span><strong>4</strong></li>
+<li><span>Unsupported task UX</span><strong>4</strong></li>
+<li><span>Frontend workspace</span><strong>4</strong></li>
 <li><span>Error handling</span><strong>3</strong></li>
-<li><span>Unsupported task UX</span><strong>3</strong></li>
 <li><span>Retry logic</span><strong>3</strong></li>
+<li><span>Tool routing</span><strong>3</strong></li>
 <li><span>Planning</span><strong>3</strong></li>
-<li><span>Text tool</span><strong>3</strong></li>
 <li><span>Safety</span><strong>3</strong></li>
-<li><span>Frontend workspace</span><strong>3</strong></li>
+<li><span>Frontend routing</span><strong>3</strong></li>
 <li><span>Calculator tool</span><strong>2</strong></li>
 <li><span>Weather tool</span><strong>2</strong></li>
 <li><span>Currency tool</span><strong>2</strong></li>
 <li><span>Transaction categorizer</span><strong>2</strong></li>
 <li><span>Frontend streaming</span><strong>2</strong></li>
 <li><span>Composer validation</span><strong>2</strong></li>
-<li><span>Frontend routing</span><strong>2</strong></li>
 <li><span>Frontend admin</span><strong>2</strong></li>
 <li><span>Core API</span><strong>1</strong></li>
 <li><span>Health endpoint</span><strong>1</strong></li>
@@ -350,13 +351,13 @@
 <li><span>User management</span><strong>1</strong></li>
 <li><span>History search</span><strong>1</strong></li>
 <li><span>Deletion</span><strong>1</strong></li>
-<li><span>Tool routing</span><strong>1</strong></li>
 <li><span>Setup</span><strong>1</strong></li>
 <li><span>Frontend login</span><strong>1</strong></li>
 <li><span>Authentication UX</span><strong>1</strong></li>
 <li><span>Response hierarchy</span><strong>1</strong></li>
 <li><span>Fallback behavior</span><strong>1</strong></li>
-<li><span>History sidebar</span><strong>1</strong></li></ul>
+<li><span>History sidebar</span><strong>1</strong></li>
+<li><span>Interaction polish</span><strong>1</strong></li></ul>
       </article>
     </section>
 
@@ -391,7 +392,7 @@
           <td>Health check responds successfully without requiring authentication.</td>
           <td>Core API, Health endpoint</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.779</td>
+          <td>0.279</td>
           <td>-</td>
         </tr>
         
@@ -403,7 +404,7 @@
           <td>Login creates an authenticated session and the current-user endpoint returns the signed-in account.</td>
           <td>Authentication, RBAC</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.758</td>
+          <td>0.516</td>
           <td>-</td>
         </tr>
         
@@ -415,7 +416,7 @@
           <td>Admin users can manage local accounts while standard users are blocked from admin-only routes.</td>
           <td>Admin workflow, RBAC, User management</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>1.360</td>
+          <td>0.873</td>
           <td>-</td>
         </tr>
         
@@ -427,7 +428,43 @@
           <td>Thread history stores multiple turns and remains searchable by prompt content.</td>
           <td>Threaded chat, Persistence, History search</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>1.416</td>
+          <td>0.538</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_rejects_sixth_thread creating a sixth thread is rejected before persistence with the configured per-user chat limit. threaded chat validation persistence">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_rejects_sixth_thread</td>
+          <td>Creating a sixth thread is rejected before persistence with the configured per-user chat limit.</td>
+          <td>Threaded chat, Validation, Persistence</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.553</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_rejects_fourth_thread_flow_before_execution submitting a fourth saved task flow in one chat is rejected before task execution begins. threaded chat validation execution trace">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_rejects_fourth_thread_flow_before_execution</td>
+          <td>Submitting a fourth saved task flow in one chat is rejected before task execution begins.</td>
+          <td>Threaded chat, Validation, Execution trace</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.541</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_rejects_fourth_thread_flow_on_stream_route the streaming task endpoint rejects a fourth task flow before opening an sse execution stream. streaming validation threaded chat">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_rejects_fourth_thread_flow_on_stream_route</td>
+          <td>The streaming task endpoint rejects a fourth task flow before opening an SSE execution stream.</td>
+          <td>Streaming, Validation, Threaded chat</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.524</td>
           <td>-</td>
         </tr>
         
@@ -439,7 +476,7 @@
           <td>Deleting a thread removes its stored turns and hides it from history.</td>
           <td>Threaded chat, Persistence, Deletion</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>1.338</td>
+          <td>0.644</td>
           <td>-</td>
         </tr>
         
@@ -451,7 +488,7 @@
           <td>The task API supports up to two subtasks in one request and returns combined multi-tool output.</td>
           <td>Multi-step reasoning, Tool execution, Core challenge</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.827</td>
+          <td>0.588</td>
           <td>-</td>
         </tr>
         
@@ -463,7 +500,7 @@
           <td>Requests containing more than two subtasks are rejected with a validation error.</td>
           <td>Validation, Core challenge</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>1.011</td>
+          <td>0.503</td>
           <td>-</td>
         </tr>
         
@@ -475,7 +512,7 @@
           <td>Unsupported requests are returned as handled task results instead of crashing the API.</td>
           <td>Error handling, Unsupported task UX</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.900</td>
+          <td>0.366</td>
           <td>-</td>
         </tr>
         
@@ -487,7 +524,7 @@
           <td>Streaming execution emits ordered trace events and finishes with the persisted thread payload.</td>
           <td>Streaming, Execution trace, Persistence</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.696</td>
+          <td>0.352</td>
           <td>-</td>
         </tr>
         
@@ -499,7 +536,7 @@
           <td>Streaming execution returns a completed unsupported-task turn rather than failing the stream.</td>
           <td>Streaming, Unsupported task UX</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.611</td>
+          <td>0.331</td>
           <td>-</td>
         </tr>
         
@@ -511,7 +548,7 @@
           <td>Streaming execution surfaces retry scheduling before completing successfully after a transient tool failure.</td>
           <td>Streaming, Retry logic, Execution trace</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.993</td>
+          <td>0.318</td>
           <td>-</td>
         </tr>
         
@@ -524,6 +561,18 @@
           <td>Tool routing, Core challenge</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
           <td>0.002</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_interpreter_routes_supported_synonym_prompts interpreter recognizes the documented natural-language synonym prompts for text, calculator, weather, currency, and transaction tools. tool routing core challenge validation">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_routes_supported_synonym_prompts</td>
+          <td>Interpreter recognizes the documented natural-language synonym prompts for text, calculator, weather, currency, and transaction tools.</td>
+          <td>Tool routing, Core challenge, Validation</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
           <td>-</td>
         </tr>
         
@@ -559,7 +608,7 @@
           <td>Interpreter accepts unquoted text transforms inside a two-subtask request.</td>
           <td>Multi-step reasoning, Text tool</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.002</td>
+          <td>0.001</td>
           <td>-</td>
         </tr>
         
@@ -583,7 +632,19 @@
           <td>Controller combines multiple tool outputs into one ordered final response payload.</td>
           <td>Execution trace, Multi-step reasoning, Core challenge</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.001</td>
+          <td>0.013</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_controller_counts_words_for_count_the_word_prompt controller treats count-the-word prompts as supported text word-count requests and returns the expected completed output. text tool core challenge tool routing">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_controller_counts_words_for_count_the_word_prompt</td>
+          <td>Controller treats count-the-word prompts as supported text word-count requests and returns the expected completed output.</td>
+          <td>Text tool, Core challenge, Tool routing</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.012</td>
           <td>-</td>
         </tr>
         
@@ -595,7 +656,19 @@
           <td>Controller converts unsupported requests into handled thread turns with response assembly steps.</td>
           <td>Error handling, Unsupported task UX</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.001</td>
+          <td>0.013</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_controller_returns_handled_unsupported_turn_for_occurrence_count_prompt controller keeps substring or occurrence-count wording unsupported and returns a handled unsupported-task turn. text tool unsupported task ux validation">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_controller_returns_handled_unsupported_turn_for_occurrence_count_prompt</td>
+          <td>Controller keeps substring or occurrence-count wording unsupported and returns a handled unsupported-task turn.</td>
+          <td>Text tool, Unsupported task UX, Validation</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.012</td>
           <td>-</td>
         </tr>
         
@@ -607,7 +680,7 @@
           <td>Controller retries a retryable tool failure once and records the retry step in the trace.</td>
           <td>Retry logic, Execution trace</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.001</td>
+          <td>0.013</td>
           <td>-</td>
         </tr>
         
@@ -619,7 +692,7 @@
           <td>Controller returns a handled failed turn when a retryable tool error still fails after the retry limit.</td>
           <td>Retry logic, Error handling</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.002</td>
+          <td>0.013</td>
           <td>-</td>
         </tr>
         
@@ -631,7 +704,7 @@
           <td>Repository initialization seeds only the documented bootstrap admin account.</td>
           <td>RBAC, Persistence, Setup</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.654</td>
+          <td>0.252</td>
           <td>-</td>
         </tr>
         
@@ -643,7 +716,7 @@
           <td>Repository persists masked turn content and auto-generates thread titles from the first task.</td>
           <td>Persistence, Safety, Threaded chat</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.553</td>
+          <td>0.174</td>
           <td>-</td>
         </tr>
         
@@ -655,7 +728,7 @@
           <td>Repository rejects new users whose passwords do not meet the documented policy.</td>
           <td>Admin workflow, Validation, RBAC</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.623</td>
+          <td>0.143</td>
           <td>-</td>
         </tr>
         
@@ -667,7 +740,67 @@
           <td>Repository enforces the configured maximum number of admin and standard user accounts.</td>
           <td>Admin workflow, RBAC, Validation</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.720</td>
+          <td>0.480</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_repository_enforces_thread_limit repository rejects a sixth chat thread for the same user. threaded chat validation persistence">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_repository_enforces_thread_limit</td>
+          <td>Repository rejects a sixth chat thread for the same user.</td>
+          <td>Threaded chat, Validation, Persistence</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.178</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_repository_enforces_thread_flow_limit repository rejects a fourth saved task flow inside the same chat thread. threaded chat validation persistence">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_repository_enforces_thread_flow_limit</td>
+          <td>Repository rejects a fourth saved task flow inside the same chat thread.</td>
+          <td>Threaded chat, Validation, Persistence</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.210</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_reports test_normalize_coverage_label_strips_bonus_prefix test normalize coverage label strips bonus prefix ">
+          <td>backend</td>
+          <td>tests.unit.test_reports</td>
+          <td>test_normalize_coverage_label_strips_bonus_prefix</td>
+          <td>test normalize coverage label strips bonus prefix</td>
+          <td></td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_reports test_parse_junit_normalizes_coverage_labels test parse junit normalizes coverage labels ">
+          <td>backend</td>
+          <td>tests.unit.test_reports</td>
+          <td>test_parse_junit_normalizes_coverage_labels</td>
+          <td>test parse junit normalizes coverage labels</td>
+          <td></td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.005</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_reports test_build_dashboard_omits_bonus_prefix_from_rendered_html test build dashboard omits bonus prefix from rendered html ">
+          <td>backend</td>
+          <td>tests.unit.test_reports</td>
+          <td>test_build_dashboard_omits_bonus_prefix_from_rendered_html</td>
+          <td>test build dashboard omits bonus prefix from rendered html</td>
+          <td></td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
           <td>-</td>
         </tr>
         
@@ -679,7 +812,7 @@
           <td>Safety guard rejects input longer than the documented 250 character limit.</td>
           <td>Safety, Validation</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.002</td>
+          <td>0.001</td>
           <td>-</td>
         </tr>
         
@@ -727,7 +860,7 @@
           <td>Calculator preserves arithmetic precedence and parentheses order.</td>
           <td>Calculator tool, Tool execution</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.002</td>
+          <td>0.001</td>
           <td>-</td>
         </tr>
         
@@ -739,7 +872,7 @@
           <td>Calculator rejects divide-by-zero expressions safely.</td>
           <td>Calculator tool, Validation</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.002</td>
+          <td>0.001</td>
           <td>-</td>
         </tr>
         
@@ -751,7 +884,7 @@
           <td>Weather tool matches supported cities without case sensitivity.</td>
           <td>Weather tool, Tool execution</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.002</td>
+          <td>0.001</td>
           <td>-</td>
         </tr>
         
@@ -823,7 +956,7 @@
           <td>Login renders the branded sign-in flow and transitions into the authenticated workspace shell.</td>
           <td>Frontend login, Authentication UX</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.3286077</td>
+          <td>0.3832605</td>
           <td>-</td>
         </tr>
         
@@ -834,14 +967,21 @@
           <td>App &gt; creates a new chat and renders the response card hierarchy</td>
           <td>Submitting a task creates a new chat and renders the final-output-first response card layout.</td>
           <td>Frontend workspace, Core challenge, Response hierarchy</td>
-          <td><span class="status-pill status-pill--failed">failed</span></td>
-          <td>0.2722468</td>
-          <td>expected &#x27;/&#x27; to be &#x27;/threads/thread-2&#x27; // Object.is equality AssertionError: expected &#x27;/&#x27; to be &#x27;/threads/thread-2&#x27; // Object.is equality
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.3510417</td>
+          <td>-</td>
+        </tr>
+        
 
-Expected: &quot;/threads/thread-2&quot;
-Received: &quot;/&quot;
-
- ❯ src/App.test.tsx:332:38</td>
+        <tr data-search="frontend src/app.test.tsx app &gt; creates a chat from the home workspace on first submission and activates the thread route submitting the first task from workspace home creates a new chat and activates the thread route using the created thread payload. frontend routing threaded chat core challenge">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; creates a chat from the home workspace on first submission and activates the thread route</td>
+          <td>Submitting the first task from workspace home creates a new chat and activates the thread route using the created thread payload.</td>
+          <td>Frontend routing, Threaded chat, Core challenge</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.2013687</td>
+          <td>-</td>
         </tr>
         
 
@@ -852,7 +992,7 @@ Received: &quot;/&quot;
           <td>The workspace shows streamed trace steps live before the final persisted turn replaces the pending card.</td>
           <td>Frontend streaming, Execution trace, Streaming</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.3667808</td>
+          <td>0.450278</td>
           <td>-</td>
         </tr>
         
@@ -864,7 +1004,7 @@ Received: &quot;/&quot;
           <td>The frontend falls back to the synchronous task endpoint when streaming cannot be established.</td>
           <td>Frontend streaming, Fallback behavior</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.1741088</td>
+          <td>0.1664482</td>
           <td>-</td>
         </tr>
         
@@ -876,7 +1016,7 @@ Received: &quot;/&quot;
           <td>The left rail toggle collapses and re-expands the thread history panel without breaking workspace access.</td>
           <td>Frontend workspace, History sidebar</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.1000948</td>
+          <td>0.1142635</td>
           <td>-</td>
         </tr>
         
@@ -888,7 +1028,7 @@ Received: &quot;/&quot;
           <td>Composer validation appears inline when a request exceeds the two-subtask limit.</td>
           <td>Composer validation, Core challenge</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.0771534</td>
+          <td>0.0807562</td>
           <td>-</td>
         </tr>
         
@@ -900,7 +1040,7 @@ Received: &quot;/&quot;
           <td>Direct thread URLs resolve to a saved chat or redirect back to the home workspace when the thread is missing.</td>
           <td>Frontend routing, Threaded chat, Validation</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.0705427</td>
+          <td>0.0572637</td>
           <td>-</td>
         </tr>
         
@@ -912,7 +1052,7 @@ Received: &quot;/&quot;
           <td>The sidebar disables new chat creation when the user has already reached the five-thread limit.</td>
           <td>Frontend workspace, Validation, Threaded chat</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.1135684</td>
+          <td>0.1084234</td>
           <td>-</td>
         </tr>
         
@@ -924,7 +1064,19 @@ Received: &quot;/&quot;
           <td>The composer is disabled when the selected chat already contains three saved task flows.</td>
           <td>Composer validation, Threaded chat, Frontend routing</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.1372259</td>
+          <td>0.1285028</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; auto-scrolls the active thread when a later response is appended the active chat auto-scrolls to the newest pending and completed content when a later response is appended in-session. frontend workspace threaded chat interaction polish">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; auto-scrolls the active thread when a later response is appended</td>
+          <td>The active chat auto-scrolls to the newest pending and completed content when a later response is appended in-session.</td>
+          <td>Frontend workspace, Threaded chat, Interaction polish</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.2167385</td>
           <td>-</td>
         </tr>
         
@@ -936,7 +1088,7 @@ Received: &quot;/&quot;
           <td>Admins can open the admin page, create users, reveal passwords only for users created in the current session, and delete those users.</td>
           <td>Admin workflow, RBAC, Frontend admin</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.4371495</td>
+          <td>0.6857964</td>
           <td>-</td>
         </tr>
         
@@ -948,7 +1100,7 @@ Received: &quot;/&quot;
           <td>Standard users do not see admin navigation controls in the workspace.</td>
           <td>RBAC, Frontend admin</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.0387839</td>
+          <td>0.0477441</td>
           <td>-</td>
         </tr>
         

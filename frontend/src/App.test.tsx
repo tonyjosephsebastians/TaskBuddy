@@ -12,6 +12,7 @@ let threads: ThreadSummary[]
 let threadDetails: Record<string, ThreadDetail>
 let streamMode: 'normal' | 'slow' | 'unavailable'
 let threadCounter: number
+let scrollIntoViewMock: ReturnType<typeof vi.fn>
 
 function buildCompletedTurn(taskText: string): TurnResponse {
   return {
@@ -131,6 +132,11 @@ function buildStreamResponse(turn: TurnResponse, detail: ThreadDetail, mode: 'no
 beforeEach(() => {
   vi.restoreAllMocks()
   window.history.pushState({}, '', '/')
+  scrollIntoViewMock = vi.fn()
+  Object.defineProperty(window.HTMLElement.prototype, 'scrollIntoView', {
+    configurable: true,
+    value: scrollIntoViewMock,
+  })
   sessionUser = null
   users = [
     { user_id: 'user-admin', username: 'admin', role: 'admin', created_at: '2026-03-14T18:00:00Z' },
@@ -330,6 +336,7 @@ describe('App', () => {
     await screen.findByPlaceholderText('Search chat threads')
     fireEvent.click(screen.getByRole('button', { name: 'Start new chat' }))
     await waitFor(() => {
+      expect(screen.getByText('New chat')).toBeInTheDocument()
       expect(window.location.pathname).toBe('/threads/thread-2')
     })
     fireEvent.change(screen.getByPlaceholderText('Ask TaskBuddy to run up to 2 supported subtasks.'), {
@@ -343,6 +350,22 @@ describe('App', () => {
     expect(screen.getAllByText('Final output').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Tools used').length).toBeGreaterThan(0)
     expect(screen.getAllByText('TASK BUDDY').length).toBeGreaterThan(0)
+  })
+
+  it('creates a chat from the home workspace on first submission and activates the thread route', async () => {
+    sessionUser = adminUser
+    render(<App />)
+
+    await screen.findByPlaceholderText('Search chat threads')
+    fireEvent.change(screen.getByPlaceholderText('Ask TaskBuddy to run up to 2 supported subtasks.'), {
+      target: { value: 'Convert "task buddy" to uppercase' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Run task' }))
+
+    await waitFor(() => {
+      expect(window.location.pathname).toBe('/threads/thread-2')
+    })
+    expect(await screen.findByText('TASK BUDDY')).toBeInTheDocument()
   })
 
   it('renders streamed execution trace steps before completion', async () => {
@@ -460,6 +483,32 @@ describe('App', () => {
     expect(await screen.findByText('Each chat supports up to 3 task flows. Start a new chat or delete an old one to continue.')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Ask TaskBuddy to run up to 2 supported subtasks.')).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Run task' })).toBeDisabled()
+  })
+
+  it('auto-scrolls the active thread when a later response is appended', async () => {
+    sessionUser = adminUser
+    window.history.pushState({}, '', '/threads/thread-1')
+    threadDetails['thread-1'] = {
+      ...threadDetails['thread-1'],
+      turns: [
+        buildCompletedTurn('Convert "task buddy" to uppercase'),
+        buildCompletedTurn('What is the weather in Toronto?'),
+      ],
+    }
+
+    render(<App />)
+
+    expect(await screen.findAllByText('Execution trace')).toHaveLength(2)
+    expect(scrollIntoViewMock).not.toHaveBeenCalled()
+
+    fireEvent.change(screen.getByPlaceholderText('Ask TaskBuddy to run up to 2 supported subtasks.'), {
+      target: { value: 'Convert "later turn" to uppercase' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Run task' }))
+
+    await waitFor(() => {
+      expect(scrollIntoViewMock).toHaveBeenCalled()
+    })
   })
 
   it('navigates to the admin page and reveals passwords only for session-created users', async () => {

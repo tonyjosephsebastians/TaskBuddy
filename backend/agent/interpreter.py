@@ -14,7 +14,9 @@ MULTI_TASK_SPLIT_PATTERN = re.compile(r"\s+(?:and|then)\s+", re.IGNORECASE)
 TEXT_CONVERT_PATTERN = re.compile(
     r"(?i)^(?:convert|change|make|turn)\s+(.+?)\s+to\s+(uppercase|upper case|upper|lowercase|lower case|lower|titlecase|title case|title)\b"
 )
-WORD_COUNT_PATTERN = re.compile(r"(?i)^(?:count words in|word count for|word count of|how many words in)\s+(.+)$")
+WORD_COUNT_PATTERN = re.compile(
+    r"(?i)^(?:count words in|count the words in|count the word|count word|word count for|word count of|how many words in|how many words are in)\s+(.+)$"
+)
 CHAR_COUNT_PATTERN = re.compile(
     r"(?i)^(?:count characters in|character count for|character count of|char count for|char count of|how many characters in)\s+(.+)$"
 )
@@ -164,7 +166,7 @@ class TaskInterpreter:
             "uppercase": ["uppercase", "upper case", "upper"],
             "lowercase": ["lowercase", "lower case", "lower"],
             "titlecase": ["titlecase", "title case", "title"],
-            "word_count": ["word count", "count words", "how many words"],
+            "word_count": ["word count", "count words", "count the words", "count the word", "count word", "how many words"],
             "char_count": ["character count", "char count", "count characters", "how many characters"],
         }
         for operation, phrases in operation_map.items():
@@ -197,7 +199,7 @@ class TaskInterpreter:
             return self._clean_text_target(text.split(":", 1)[1])
 
         cleaned = re.sub(
-            r"(?i)\b(convert|change|make|turn|uppercase|upper case|upper|lowercase|lower case|lower|titlecase|title case|title|word count|count words|how many words|character count|char count|count characters|how many characters|of|for|to)\b",
+            r"(?i)\b(convert|change|make|turn|uppercase|upper case|upper|lowercase|lower case|lower|titlecase|title case|title|word count|count words|count the words|count the word|count word|how many words|character count|char count|count characters|how many characters|of|for|to|are|in)\b",
             " ",
             text,
         )
