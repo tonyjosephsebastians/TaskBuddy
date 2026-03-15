@@ -27,6 +27,14 @@
     "description": "Composer validation appears inline when a request exceeds the two-subtask limit.",
     "coverage": ["Composer validation", "Core challenge"]
   },
+  "src/App.test.tsx::App > allows quoted and inside a single text task without triggering subtask validation": {
+    "description": "Composer validation ignores and inside quoted text so a single text-transform request can still be submitted.",
+    "coverage": ["Composer validation", "Text tool", "Frontend workspace"]
+  },
+  "src/App.test.tsx::App > still flags a real three-subtask request when one segment contains quoted and": {
+    "description": "Composer validation still rejects a real three-subtask request even when one segment contains quoted text with and.",
+    "coverage": ["Composer validation", "Core challenge", "Frontend workspace"]
+  },
   "src/App.test.tsx::App > loads direct thread routes and redirects missing threads home": {
     "description": "Direct thread URLs resolve to a saved chat or redirect back to the home workspace when the thread is missing.",
     "coverage": ["Frontend routing", "Threaded chat", "Validation"]

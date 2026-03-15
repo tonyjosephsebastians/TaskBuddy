@@ -258,14 +258,14 @@
         
     <article class="metric-card">
       <div class="metric-card__label">Total tests</div>
-      <strong>60</strong>
+      <strong>76</strong>
       <p>Complete backend and frontend validation set</p>
     </article>
     
 
     <article class="metric-card">
       <div class="metric-card__label">Passed</div>
-      <strong>60</strong>
+      <strong>76</strong>
       <p>Stable validations currently passing</p>
     </article>
     
@@ -298,15 +298,15 @@
           
         <article class="metric-card metric-card--compact">
           <div class="metric-card__label">backend</div>
-          <strong>47</strong>
-          <p>47 passed &bull; 0 failed &bull; 0 skipped</p>
+          <strong>61</strong>
+          <p>61 passed &bull; 0 failed &bull; 0 skipped</p>
         </article>
         
 
         <article class="metric-card metric-card--compact">
           <div class="metric-card__label">frontend</div>
-          <strong>13</strong>
-          <p>13 passed &bull; 0 failed &bull; 0 skipped</p>
+          <strong>15</strong>
+          <p>15 passed &bull; 0 failed &bull; 0 skipped</p>
         </article>
         
         </div>
@@ -319,31 +319,31 @@
             <p>Normalized challenge coverage labels used in the export outputs.</p>
           </div>
         </div>
-        <ul><li><span>Validation</span><strong>19</strong></li>
+        <ul><li><span>Validation</span><strong>29</strong></li>
+<li><span>Core challenge</span><strong>15</strong></li>
 <li><span>Threaded chat</span><strong>13</strong></li>
-<li><span>Core challenge</span><strong>9</strong></li>
+<li><span>Text tool</span><strong>10</strong></li>
 <li><span>Persistence</span><strong>8</strong></li>
+<li><span>Tool routing</span><strong>8</strong></li>
 <li><span>RBAC</span><strong>7</strong></li>
+<li><span>Execution trace</span><strong>7</strong></li>
+<li><span>Multi-step reasoning</span><strong>7</strong></li>
 <li><span>Tool execution</span><strong>7</strong></li>
-<li><span>Execution trace</span><strong>6</strong></li>
-<li><span>Streaming</span><strong>5</strong></li>
-<li><span>Multi-step reasoning</span><strong>5</strong></li>
-<li><span>Text tool</span><strong>5</strong></li>
+<li><span>Currency tool</span><strong>7</strong></li>
+<li><span>Planning</span><strong>7</strong></li>
+<li><span>Streaming</span><strong>6</strong></li>
+<li><span>Frontend workspace</span><strong>6</strong></li>
+<li><span>Transaction categorizer</span><strong>5</strong></li>
 <li><span>Admin workflow</span><strong>4</strong></li>
+<li><span>Error handling</span><strong>4</strong></li>
 <li><span>Unsupported task UX</span><strong>4</strong></li>
-<li><span>Frontend workspace</span><strong>4</strong></li>
-<li><span>Error handling</span><strong>3</strong></li>
+<li><span>Composer validation</span><strong>4</strong></li>
 <li><span>Retry logic</span><strong>3</strong></li>
-<li><span>Tool routing</span><strong>3</strong></li>
-<li><span>Planning</span><strong>3</strong></li>
 <li><span>Safety</span><strong>3</strong></li>
 <li><span>Frontend routing</span><strong>3</strong></li>
 <li><span>Calculator tool</span><strong>2</strong></li>
 <li><span>Weather tool</span><strong>2</strong></li>
-<li><span>Currency tool</span><strong>2</strong></li>
-<li><span>Transaction categorizer</span><strong>2</strong></li>
 <li><span>Frontend streaming</span><strong>2</strong></li>
-<li><span>Composer validation</span><strong>2</strong></li>
 <li><span>Frontend admin</span><strong>2</strong></li>
 <li><span>Core API</span><strong>1</strong></li>
 <li><span>Health endpoint</span><strong>1</strong></li>
@@ -392,7 +392,7 @@
           <td>Health check responds successfully without requiring authentication.</td>
           <td>Core API, Health endpoint</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.279</td>
+          <td>0.202</td>
           <td>-</td>
         </tr>
         
@@ -404,7 +404,7 @@
           <td>Login creates an authenticated session and the current-user endpoint returns the signed-in account.</td>
           <td>Authentication, RBAC</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.516</td>
+          <td>0.421</td>
           <td>-</td>
         </tr>
         
@@ -416,7 +416,7 @@
           <td>Admin users can manage local accounts while standard users are blocked from admin-only routes.</td>
           <td>Admin workflow, RBAC, User management</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.873</td>
+          <td>0.668</td>
           <td>-</td>
         </tr>
         
@@ -428,7 +428,7 @@
           <td>Thread history stores multiple turns and remains searchable by prompt content.</td>
           <td>Threaded chat, Persistence, History search</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.538</td>
+          <td>0.424</td>
           <td>-</td>
         </tr>
         
@@ -440,7 +440,7 @@
           <td>Creating a sixth thread is rejected before persistence with the configured per-user chat limit.</td>
           <td>Threaded chat, Validation, Persistence</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.553</td>
+          <td>0.404</td>
           <td>-</td>
         </tr>
         
@@ -452,7 +452,7 @@
           <td>Submitting a fourth saved task flow in one chat is rejected before task execution begins.</td>
           <td>Threaded chat, Validation, Execution trace</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.541</td>
+          <td>0.486</td>
           <td>-</td>
         </tr>
         
@@ -464,7 +464,7 @@
           <td>The streaming task endpoint rejects a fourth task flow before opening an SSE execution stream.</td>
           <td>Streaming, Validation, Threaded chat</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.524</td>
+          <td>0.431</td>
           <td>-</td>
         </tr>
         
@@ -476,7 +476,7 @@
           <td>Deleting a thread removes its stored turns and hides it from history.</td>
           <td>Threaded chat, Persistence, Deletion</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.644</td>
+          <td>0.383</td>
           <td>-</td>
         </tr>
         
@@ -488,7 +488,43 @@
           <td>The task API supports up to two subtasks in one request and returns combined multi-tool output.</td>
           <td>Multi-step reasoning, Tool execution, Core challenge</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.588</td>
+          <td>0.373</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_accepts_quoted_and_inside_single_text_request quoted and separators inside one text-transform request do not trigger false multi-subtask splitting in the api. text tool validation core challenge">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_accepts_quoted_and_inside_single_text_request</td>
+          <td>Quoted and separators inside one text-transform request do not trigger false multi-subtask splitting in the API.</td>
+          <td>Text tool, Validation, Core challenge</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.470</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_returns_handled_failure_for_explicit_unsupported_currency_target an explicit unsupported target currency returns a handled failure with currency_not_supported details instead of silently falling back to the source currency. currency tool validation core challenge">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_returns_handled_failure_for_explicit_unsupported_currency_target</td>
+          <td>An explicit unsupported target currency returns a handled failure with CURRENCY_NOT_SUPPORTED details instead of silently falling back to the source currency.</td>
+          <td>Currency tool, Validation, Core challenge</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.353</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_routes_transaction_prompt_with_currency_amount_to_categorizer a transaction prompt that includes a currency amount still routes to the transaction categorizer rather than the currency converter. tool routing transaction categorizer core challenge">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_routes_transaction_prompt_with_currency_amount_to_categorizer</td>
+          <td>A transaction prompt that includes a currency amount still routes to the transaction categorizer rather than the currency converter.</td>
+          <td>Tool routing, Transaction categorizer, Core challenge</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.309</td>
           <td>-</td>
         </tr>
         
@@ -500,7 +536,19 @@
           <td>Requests containing more than two subtasks are rejected with a validation error.</td>
           <td>Validation, Core challenge</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.503</td>
+          <td>0.286</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_rejects_three_real_subtasks_even_when_one_contains_quoted_and the api still rejects a real three-subtask request even when one quoted text segment contains the word and. validation multi-step reasoning core challenge">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_rejects_three_real_subtasks_even_when_one_contains_quoted_and</td>
+          <td>The API still rejects a real three-subtask request even when one quoted text segment contains the word and.</td>
+          <td>Validation, Multi-step reasoning, Core challenge</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.282</td>
           <td>-</td>
         </tr>
         
@@ -512,7 +560,7 @@
           <td>Unsupported requests are returned as handled task results instead of crashing the API.</td>
           <td>Error handling, Unsupported task UX</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.366</td>
+          <td>0.349</td>
           <td>-</td>
         </tr>
         
@@ -524,7 +572,19 @@
           <td>Streaming execution emits ordered trace events and finishes with the persisted thread payload.</td>
           <td>Streaming, Execution trace, Persistence</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.352</td>
+          <td>0.307</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.integration.test_api test_api_streams_combined_transaction_and_currency_result streaming execution returns both categorization and conversion results for the combined finance pipeline. streaming tool routing core challenge">
+          <td>backend</td>
+          <td>tests.integration.test_api</td>
+          <td>test_api_streams_combined_transaction_and_currency_result</td>
+          <td>Streaming execution returns both categorization and conversion results for the combined finance pipeline.</td>
+          <td>Streaming, Tool routing, Core challenge</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.313</td>
           <td>-</td>
         </tr>
         
@@ -536,7 +596,7 @@
           <td>Streaming execution returns a completed unsupported-task turn rather than failing the stream.</td>
           <td>Streaming, Unsupported task UX</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.331</td>
+          <td>0.300</td>
           <td>-</td>
         </tr>
         
@@ -548,7 +608,7 @@
           <td>Streaming execution surfaces retry scheduling before completing successfully after a transient tool failure.</td>
           <td>Streaming, Retry logic, Execution trace</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.318</td>
+          <td>0.310</td>
           <td>-</td>
         </tr>
         
@@ -571,6 +631,42 @@
           <td>test_interpreter_routes_supported_synonym_prompts</td>
           <td>Interpreter recognizes the documented natural-language synonym prompts for text, calculator, weather, currency, and transaction tools.</td>
           <td>Tool routing, Core challenge, Validation</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_interpreter_routes_explicit_unsupported_currency_target_to_converter interpreter preserves an explicit unsupported target currency so the converter can surface a validation error. currency tool tool routing validation">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_routes_explicit_unsupported_currency_target_to_converter</td>
+          <td>Interpreter preserves an explicit unsupported target currency so the converter can surface a validation error.</td>
+          <td>Currency tool, Tool routing, Validation</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_interpreter_keeps_same_currency_fallback_when_target_is_not_provided interpreter keeps the same-currency fallback only when no target currency is provided in the prompt. currency tool tool routing">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_keeps_same_currency_fallback_when_target_is_not_provided</td>
+          <td>Interpreter keeps the same-currency fallback only when no target currency is provided in the prompt.</td>
+          <td>Currency tool, Tool routing</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_interpreter_routes_transaction_prompt_with_currency_amount_to_categorizer interpreter keeps transaction prompts with embedded currency amounts on the categorization tool unless explicit conversion intent is present. tool routing transaction categorizer validation">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_routes_transaction_prompt_with_currency_amount_to_categorizer</td>
+          <td>Interpreter keeps transaction prompts with embedded currency amounts on the categorization tool unless explicit conversion intent is present.</td>
+          <td>Tool routing, Transaction categorizer, Validation</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
           <td>0.001</td>
           <td>-</td>
@@ -613,6 +709,54 @@
         </tr>
         
 
+        <tr data-search="backend tests.unit.test_agent test_interpreter_keeps_quoted_and_inside_single_text_task interpreter keeps quoted and separators inside one text-transform request instead of splitting them into multiple subtasks. text tool validation planning">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_keeps_quoted_and_inside_single_text_task</td>
+          <td>Interpreter keeps quoted and separators inside one text-transform request instead of splitting them into multiple subtasks.</td>
+          <td>Text tool, Validation, Planning</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_interpreter_supports_single_quoted_text_without_false_subtask_split interpreter treats single-quoted text as one payload and does not split on and inside the quoted segment. text tool validation planning">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_supports_single_quoted_text_without_false_subtask_split</td>
+          <td>Interpreter treats single-quoted text as one payload and does not split on and inside the quoted segment.</td>
+          <td>Text tool, Validation, Planning</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_interpreter_keeps_apostrophes_inside_words_outside_quote_mode interpreter does not treat apostrophes inside words as quote delimiters when counting subtasks. validation planning text tool">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_keeps_apostrophes_inside_words_outside_quote_mode</td>
+          <td>Interpreter does not treat apostrophes inside words as quote delimiters when counting subtasks.</td>
+          <td>Validation, Planning, Text tool</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_interpreter_rejects_three_real_subtasks_even_with_quoted_and interpreter still enforces the two-subtask limit when one segment contains quoted and but there are three real subtasks overall. validation planning multi-step reasoning">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_interpreter_rejects_three_real_subtasks_even_with_quoted_and</td>
+          <td>Interpreter still enforces the two-subtask limit when one segment contains quoted and but there are three real subtasks overall.</td>
+          <td>Validation, Planning, Multi-step reasoning</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.001</td>
+          <td>-</td>
+        </tr>
+        
+
         <tr data-search="backend tests.unit.test_agent test_interpreter_rejects_more_than_two_subtasks interpreter enforces the maximum of two subtasks per request. validation planning">
           <td>backend</td>
           <td>tests.unit.test_agent</td>
@@ -632,7 +776,7 @@
           <td>Controller combines multiple tool outputs into one ordered final response payload.</td>
           <td>Execution trace, Multi-step reasoning, Core challenge</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.013</td>
+          <td>0.012</td>
           <td>-</td>
         </tr>
         
@@ -643,6 +787,30 @@
           <td>test_controller_counts_words_for_count_the_word_prompt</td>
           <td>Controller treats count-the-word prompts as supported text word-count requests and returns the expected completed output.</td>
           <td>Text tool, Core challenge, Tool routing</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.010</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_controller_combines_transaction_and_currency_results controller returns both categorization and conversion summaries in numbered order for the supported finance pipeline. execution trace transaction categorizer currency tool">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_controller_combines_transaction_and_currency_results</td>
+          <td>Controller returns both categorization and conversion summaries in numbered order for the supported finance pipeline.</td>
+          <td>Execution trace, Transaction categorizer, Currency tool</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.012</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="backend tests.unit.test_agent test_controller_returns_handled_failure_for_explicit_unsupported_currency_target controller returns a handled failed turn with supported currency details when the prompt names an unsupported explicit target currency. currency tool error handling validation">
+          <td>backend</td>
+          <td>tests.unit.test_agent</td>
+          <td>test_controller_returns_handled_failure_for_explicit_unsupported_currency_target</td>
+          <td>Controller returns a handled failed turn with supported currency details when the prompt names an unsupported explicit target currency.</td>
+          <td>Currency tool, Error handling, Validation</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
           <td>0.012</td>
           <td>-</td>
@@ -656,7 +824,7 @@
           <td>Controller converts unsupported requests into handled thread turns with response assembly steps.</td>
           <td>Error handling, Unsupported task UX</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.013</td>
+          <td>0.014</td>
           <td>-</td>
         </tr>
         
@@ -668,7 +836,7 @@
           <td>Controller keeps substring or occurrence-count wording unsupported and returns a handled unsupported-task turn.</td>
           <td>Text tool, Unsupported task UX, Validation</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.012</td>
+          <td>0.010</td>
           <td>-</td>
         </tr>
         
@@ -680,7 +848,7 @@
           <td>Controller retries a retryable tool failure once and records the retry step in the trace.</td>
           <td>Retry logic, Execution trace</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.013</td>
+          <td>0.014</td>
           <td>-</td>
         </tr>
         
@@ -692,7 +860,7 @@
           <td>Controller returns a handled failed turn when a retryable tool error still fails after the retry limit.</td>
           <td>Retry logic, Error handling</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.013</td>
+          <td>0.012</td>
           <td>-</td>
         </tr>
         
@@ -704,7 +872,7 @@
           <td>Repository initialization seeds only the documented bootstrap admin account.</td>
           <td>RBAC, Persistence, Setup</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.252</td>
+          <td>0.244</td>
           <td>-</td>
         </tr>
         
@@ -716,7 +884,7 @@
           <td>Repository persists masked turn content and auto-generates thread titles from the first task.</td>
           <td>Persistence, Safety, Threaded chat</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.174</td>
+          <td>0.163</td>
           <td>-</td>
         </tr>
         
@@ -728,7 +896,7 @@
           <td>Repository rejects new users whose passwords do not meet the documented policy.</td>
           <td>Admin workflow, Validation, RBAC</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.143</td>
+          <td>0.131</td>
           <td>-</td>
         </tr>
         
@@ -740,7 +908,7 @@
           <td>Repository enforces the configured maximum number of admin and standard user accounts.</td>
           <td>Admin workflow, RBAC, Validation</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.480</td>
+          <td>0.460</td>
           <td>-</td>
         </tr>
         
@@ -752,7 +920,7 @@
           <td>Repository rejects a sixth chat thread for the same user.</td>
           <td>Threaded chat, Validation, Persistence</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.178</td>
+          <td>0.174</td>
           <td>-</td>
         </tr>
         
@@ -764,7 +932,7 @@
           <td>Repository rejects a fourth saved task flow inside the same chat thread.</td>
           <td>Threaded chat, Validation, Persistence</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.210</td>
+          <td>0.228</td>
           <td>-</td>
         </tr>
         
@@ -788,7 +956,7 @@
           <td>test parse junit normalizes coverage labels</td>
           <td></td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.005</td>
+          <td>0.006</td>
           <td>-</td>
         </tr>
         
@@ -944,7 +1112,7 @@
           <td>Transaction categorizer falls back to the generic other category when no keyword matches.</td>
           <td>Transaction categorizer, Tool execution</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.002</td>
+          <td>0.001</td>
           <td>-</td>
         </tr>
         
@@ -956,7 +1124,7 @@
           <td>Login renders the branded sign-in flow and transitions into the authenticated workspace shell.</td>
           <td>Frontend login, Authentication UX</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.3832605</td>
+          <td>0.2506717</td>
           <td>-</td>
         </tr>
         
@@ -968,7 +1136,7 @@
           <td>Submitting a task creates a new chat and renders the final-output-first response card layout.</td>
           <td>Frontend workspace, Core challenge, Response hierarchy</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.3510417</td>
+          <td>0.189154</td>
           <td>-</td>
         </tr>
         
@@ -980,7 +1148,7 @@
           <td>Submitting the first task from workspace home creates a new chat and activates the thread route using the created thread payload.</td>
           <td>Frontend routing, Threaded chat, Core challenge</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.2013687</td>
+          <td>0.1055352</td>
           <td>-</td>
         </tr>
         
@@ -992,7 +1160,7 @@
           <td>The workspace shows streamed trace steps live before the final persisted turn replaces the pending card.</td>
           <td>Frontend streaming, Execution trace, Streaming</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.450278</td>
+          <td>0.2992612</td>
           <td>-</td>
         </tr>
         
@@ -1004,7 +1172,7 @@
           <td>The frontend falls back to the synchronous task endpoint when streaming cannot be established.</td>
           <td>Frontend streaming, Fallback behavior</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.1664482</td>
+          <td>0.1114213</td>
           <td>-</td>
         </tr>
         
@@ -1016,7 +1184,7 @@
           <td>The left rail toggle collapses and re-expands the thread history panel without breaking workspace access.</td>
           <td>Frontend workspace, History sidebar</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.1142635</td>
+          <td>0.0914692</td>
           <td>-</td>
         </tr>
         
@@ -1028,7 +1196,31 @@
           <td>Composer validation appears inline when a request exceeds the two-subtask limit.</td>
           <td>Composer validation, Core challenge</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.0807562</td>
+          <td>0.0558851</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; allows quoted and inside a single text task without triggering subtask validation composer validation ignores and inside quoted text so a single text-transform request can still be submitted. composer validation text tool frontend workspace">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; allows quoted and inside a single text task without triggering subtask validation</td>
+          <td>Composer validation ignores and inside quoted text so a single text-transform request can still be submitted.</td>
+          <td>Composer validation, Text tool, Frontend workspace</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.1076042</td>
+          <td>-</td>
+        </tr>
+        
+
+        <tr data-search="frontend src/app.test.tsx app &gt; still flags a real three-subtask request when one segment contains quoted and composer validation still rejects a real three-subtask request even when one segment contains quoted text with and. composer validation core challenge frontend workspace">
+          <td>frontend</td>
+          <td>src/App.test.tsx</td>
+          <td>App &gt; still flags a real three-subtask request when one segment contains quoted and</td>
+          <td>Composer validation still rejects a real three-subtask request even when one segment contains quoted text with and.</td>
+          <td>Composer validation, Core challenge, Frontend workspace</td>
+          <td><span class="status-pill status-pill--passed">passed</span></td>
+          <td>0.0485662</td>
           <td>-</td>
         </tr>
         
@@ -1040,7 +1232,7 @@
           <td>Direct thread URLs resolve to a saved chat or redirect back to the home workspace when the thread is missing.</td>
           <td>Frontend routing, Threaded chat, Validation</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.0572637</td>
+          <td>0.0400324</td>
           <td>-</td>
         </tr>
         
@@ -1052,7 +1244,7 @@
           <td>The sidebar disables new chat creation when the user has already reached the five-thread limit.</td>
           <td>Frontend workspace, Validation, Threaded chat</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.1084234</td>
+          <td>0.0742665</td>
           <td>-</td>
         </tr>
         
@@ -1064,7 +1256,7 @@
           <td>The composer is disabled when the selected chat already contains three saved task flows.</td>
           <td>Composer validation, Threaded chat, Frontend routing</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.1285028</td>
+          <td>0.0856556</td>
           <td>-</td>
         </tr>
         
@@ -1076,7 +1268,7 @@
           <td>The active chat auto-scrolls to the newest pending and completed content when a later response is appended in-session.</td>
           <td>Frontend workspace, Threaded chat, Interaction polish</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.2167385</td>
+          <td>0.1351744</td>
           <td>-</td>
         </tr>
         
@@ -1088,7 +1280,7 @@
           <td>Admins can open the admin page, create users, reveal passwords only for users created in the current session, and delete those users.</td>
           <td>Admin workflow, RBAC, Frontend admin</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.6857964</td>
+          <td>0.2865468</td>
           <td>-</td>
         </tr>
         
@@ -1100,7 +1292,7 @@
           <td>Standard users do not see admin navigation controls in the workspace.</td>
           <td>RBAC, Frontend admin</td>
           <td><span class="status-pill status-pill--passed">passed</span></td>
-          <td>0.0477441</td>
+          <td>0.0491554</td>
           <td>-</td>
         </tr>
         

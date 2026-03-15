@@ -430,6 +430,36 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Run task' })).toBeDisabled()
   })
 
+  it('allows quoted and inside a single text task without triggering subtask validation', async () => {
+    sessionUser = adminUser
+    render(<App />)
+
+    await screen.findByPlaceholderText('Search chat threads')
+    fireEvent.change(screen.getByPlaceholderText('Ask TaskBuddy to run up to 2 supported subtasks.'), {
+      target: { value: 'Convert "task buddy and test bussy and file buddy" to uppercase' },
+    })
+
+    expect(screen.queryByText('Use up to 2 subtasks in a single request.')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Run task' })).not.toBeDisabled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Run task' }))
+
+    expect(await screen.findByText('TASK BUDDY')).toBeInTheDocument()
+  })
+
+  it('still flags a real three-subtask request when one segment contains quoted and', async () => {
+    sessionUser = adminUser
+    render(<App />)
+
+    await screen.findByPlaceholderText('Search chat threads')
+    fireEvent.change(screen.getByPlaceholderText('Ask TaskBuddy to run up to 2 supported subtasks.'), {
+      target: { value: 'Convert "a and b" to uppercase and weather in Toronto and calculate 2+2' },
+    })
+
+    expect(screen.getByText('Use up to 2 subtasks in a single request.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Run task' })).toBeDisabled()
+  })
+
   it('loads direct thread routes and redirects missing threads home', async () => {
     sessionUser = adminUser
     window.history.pushState({}, '', '/threads/missing-thread')

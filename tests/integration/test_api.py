@@ -216,6 +216,60 @@ def test_api_supports_two_subtasks_in_one_request(tmp_path: Path):
     assert len(body["output_data"]["results"]) == 2
 
 
+def test_api_accepts_quoted_and_inside_single_text_request(tmp_path: Path):
+    client = create_test_client(tmp_path)
+    login_as_admin(client)
+
+    thread = client.post("/api/v1/threads").json()
+    response = client.post(
+        f"/api/v1/threads/{thread['thread_id']}/tasks",
+        json={"task_text": 'Convert "task buddy and test bussy and file buddy" to uppercase'},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "completed"
+    assert body["tools_used"] == ["TextProcessorTool"]
+    assert body["final_output"] == "TASK BUDDY AND TEST BUSSY AND FILE BUDDY"
+
+
+def test_api_returns_handled_failure_for_explicit_unsupported_currency_target(tmp_path: Path):
+    client = create_test_client(tmp_path)
+    login_as_admin(client)
+
+    thread = client.post("/api/v1/threads").json()
+    response = client.post(
+        f"/api/v1/threads/{thread['thread_id']}/tasks",
+        json={"task_text": "Convert 67 CAD to INR"},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "failed"
+    assert body["tools_used"] == []
+    assert body["final_output"] == "TaskBuddy could not complete this request. Only USD, CAD, GBP, and AUD are supported."
+    assert body["output_data"]["issue"]["error_code"] == "CURRENCY_NOT_SUPPORTED"
+    assert body["output_data"]["issue"]["details"]["supported_currencies"] == ["USD", "CAD", "GBP", "AUD"]
+
+
+def test_api_routes_transaction_prompt_with_currency_amount_to_categorizer(tmp_path: Path):
+    client = create_test_client(tmp_path)
+    login_as_admin(client)
+
+    thread = client.post("/api/v1/threads").json()
+    response = client.post(
+        f"/api/v1/threads/{thread['thread_id']}/tasks",
+        json={"task_text": "Categorize Starbucks transaction 45 CAD"},
+    )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["tools_used"] == ["TransactionCategorizerTool"]
+    assert body["final_output"] == "Category: dining"
+    assert body["output_data"]["category"] == "dining"
+    assert body["output_data"]["amount"] == 45.0
+
+
 def test_api_rejects_more_than_two_subtasks(tmp_path: Path):
     client = create_test_client(tmp_path)
     login_as_admin(client)
@@ -224,6 +278,20 @@ def test_api_rejects_more_than_two_subtasks(tmp_path: Path):
     response = client.post(
         f"/api/v1/threads/{thread['thread_id']}/tasks",
         json={"task_text": "Convert hello to uppercase and calculate 25 * 3 and weather in Toronto"},
+    )
+
+    assert response.status_code == 422
+    assert response.json()["message"] == "Multi-tool execution supports up to 2 subtasks per request."
+
+
+def test_api_rejects_three_real_subtasks_even_when_one_contains_quoted_and(tmp_path: Path):
+    client = create_test_client(tmp_path)
+    login_as_admin(client)
+
+    thread = client.post("/api/v1/threads").json()
+    response = client.post(
+        f"/api/v1/threads/{thread['thread_id']}/tasks",
+        json={"task_text": 'Convert "a and b" to uppercase and weather in Toronto and calculate 2+2'},
     )
 
     assert response.status_code == 422
@@ -272,6 +340,26 @@ def test_api_streams_trace_steps_and_returns_completed_thread(tmp_path: Path):
     completed = events[-1]["data"]
     assert completed["turn"]["final_output"] == "HELLO"
     assert completed["thread"]["turns"][-1]["final_output"] == "HELLO"
+
+
+def test_api_streams_combined_transaction_and_currency_result(tmp_path: Path):
+    client = create_test_client(tmp_path)
+    login_as_admin(client)
+
+    thread = client.post("/api/v1/threads").json()
+    with client.stream(
+        "POST",
+        f"/api/v1/threads/{thread['thread_id']}/tasks/stream",
+        json={"task_text": "Categorize Starbucks transaction 45 CAD and convert to USD"},
+    ) as response:
+        events = collect_sse_events(response)
+
+    assert events[-1]["event"] == "completed"
+    completed = events[-1]["data"]
+    assert completed["turn"]["tools_used"] == ["TransactionCategorizerTool", "CurrencyConverterTool"]
+    assert completed["turn"]["final_output"] == "1. Category: dining\n2. 45.00 CAD = 33.33 USD"
+    assert len(completed["turn"]["output_data"]["results"]) == 2
+    assert completed["thread"]["turns"][-1]["final_output"] == "1. Category: dining\n2. 45.00 CAD = 33.33 USD"
 
 
 def test_api_streams_handled_unsupported_task_turn(tmp_path: Path):

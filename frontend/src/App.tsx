@@ -132,7 +132,98 @@ const INPUT_ERROR_CODES = new Set([
   'THREAD_FLOW_LIMIT_REACHED',
   'THREAD_LIMIT_REACHED',
 ])
-const SUBTASK_SPLIT_PATTERN = /\s+(?:and|then)\s+/i
+
+function isWordCharacter(value: string) {
+  return /[A-Za-z0-9_]/.test(value)
+}
+
+function isQuoteDelimiter(value: string, index: number) {
+  const quote = value[index]
+  if (quote === '"') {
+    return true
+  }
+  if (quote !== "'") {
+    return false
+  }
+  const previous = index > 0 ? value[index - 1] : ''
+  const next = index + 1 < value.length ? value[index + 1] : ''
+  return !(isWordCharacter(previous) && isWordCharacter(next))
+}
+
+function consumeSubtaskSeparator(value: string, start: number) {
+  if (!/\s/.test(value[start] ?? '')) {
+    return null
+  }
+
+  let index = start
+  while (index < value.length && /\s/.test(value[index] ?? '')) {
+    index += 1
+  }
+
+  for (const separator of ['and', 'then']) {
+    const end = index + separator.length
+    if (value.slice(index, end).toLowerCase() !== separator) {
+      continue
+    }
+    if (end >= value.length || !/\s/.test(value[end] ?? '')) {
+      continue
+    }
+    let nextIndex = end
+    while (nextIndex < value.length && /\s/.test(value[nextIndex] ?? '')) {
+      nextIndex += 1
+    }
+    return nextIndex
+  }
+
+  return null
+}
+
+function splitSubtasksOutsideQuotes(value: string) {
+  const parts: string[] = []
+  const current: string[] = []
+  let activeQuote: '"' | "'" | null = null
+  let index = 0
+
+  while (index < value.length) {
+    const character = value[index]
+
+    if (activeQuote) {
+      current.push(character)
+      if (character === activeQuote && isQuoteDelimiter(value, index)) {
+        activeQuote = null
+      }
+      index += 1
+      continue
+    }
+
+    if ((character === '"' || character === "'") && isQuoteDelimiter(value, index)) {
+      activeQuote = character
+      current.push(character)
+      index += 1
+      continue
+    }
+
+    const separatorEnd = consumeSubtaskSeparator(value, index)
+    if (separatorEnd !== null) {
+      const part = current.join('').trim().replace(/^[,?:\s]+|[,?:\s]+$/g, '')
+      if (part) {
+        parts.push(part)
+      }
+      current.length = 0
+      index = separatorEnd
+      continue
+    }
+
+    current.push(character)
+    index += 1
+  }
+
+  const trailing = current.join('').trim().replace(/^[,?:\s]+|[,?:\s]+$/g, '')
+  if (trailing) {
+    parts.push(trailing)
+  }
+  return parts
+}
 
 function getCurrentRoute(): AppRoute {
   const path = window.location.pathname
@@ -392,7 +483,7 @@ function getSubtaskCount(value: string) {
   if (!normalized) {
     return 0
   }
-  return normalized.split(SUBTASK_SPLIT_PATTERN).filter(Boolean).length
+  return splitSubtasksOutsideQuotes(normalized).length
 }
 
 function getComposerValidation(value: string) {

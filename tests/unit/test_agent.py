@@ -43,6 +43,33 @@ def test_interpreter_routes_supported_synonym_prompts():
     assert transaction_step.params == {"description": "Starbucks", "amount": None}
 
 
+def test_interpreter_routes_explicit_unsupported_currency_target_to_converter():
+    interpreter = TaskInterpreter()
+    step = interpreter.interpret("Convert 67 CAD to INR", "Convert 67 CAD to INR").steps[0]
+
+    assert step.tool_name == "CurrencyConverterTool"
+    assert step.params == {"amount": "67", "from_currency": "CAD", "to_currency": "INR"}
+
+
+def test_interpreter_keeps_same_currency_fallback_when_target_is_not_provided():
+    interpreter = TaskInterpreter()
+    step = interpreter.interpret("Convert 67 CAD", "Convert 67 CAD").steps[0]
+
+    assert step.tool_name == "CurrencyConverterTool"
+    assert step.params == {"amount": "67", "from_currency": "CAD", "to_currency": "CAD"}
+
+
+def test_interpreter_routes_transaction_prompt_with_currency_amount_to_categorizer():
+    interpreter = TaskInterpreter()
+    parsed = interpreter.interpret(
+        "Categorize Starbucks transaction 45 CAD",
+        "Categorize Starbucks transaction 45 CAD",
+    )
+
+    assert [step.tool_name for step in parsed.steps] == ["TransactionCategorizerTool"]
+    assert parsed.steps[0].params == {"description": "Starbucks 45 CAD", "amount": 45.0}
+
+
 def test_interpreter_builds_two_step_transaction_and_currency_plan():
     interpreter = TaskInterpreter()
     parsed = interpreter.interpret(
@@ -50,6 +77,7 @@ def test_interpreter_builds_two_step_transaction_and_currency_plan():
         "Categorize Starbucks transaction 45 CAD and convert to USD",
     )
     assert [step.tool_name for step in parsed.steps] == ["TransactionCategorizerTool", "CurrencyConverterTool"]
+    assert parsed.metadata["combine_results"] is True
 
 
 def test_interpreter_builds_two_independent_subtasks_from_natural_language():
@@ -73,6 +101,60 @@ def test_interpreter_supports_unquoted_text_task_in_multi_subtask_mode():
     assert parsed.steps[0].tool_name == "TextProcessorTool"
     assert parsed.steps[0].params["text"] == "hello"
     assert parsed.steps[1].tool_name == "WeatherMockTool"
+
+
+def test_interpreter_keeps_quoted_and_inside_single_text_task():
+    interpreter = TaskInterpreter()
+    parsed = interpreter.interpret(
+        'Convert "task buddy and test bussy and file buddy" to uppercase',
+        'Convert "task buddy and test bussy and file buddy" to uppercase',
+    )
+
+    assert [step.tool_name for step in parsed.steps] == ["TextProcessorTool"]
+    assert parsed.steps[0].params == {
+        "operation": "uppercase",
+        "text": "task buddy and test bussy and file buddy",
+    }
+
+
+def test_interpreter_supports_single_quoted_text_without_false_subtask_split():
+    interpreter = TaskInterpreter()
+    parsed = interpreter.interpret(
+        "Convert 'task buddy and test bussy' to uppercase",
+        "Convert 'task buddy and test bussy' to uppercase",
+    )
+
+    assert [step.tool_name for step in parsed.steps] == ["TextProcessorTool"]
+    assert parsed.steps[0].params == {
+        "operation": "uppercase",
+        "text": "task buddy and test bussy",
+    }
+
+
+def test_interpreter_keeps_apostrophes_inside_words_outside_quote_mode():
+    interpreter = TaskInterpreter()
+    parsed = interpreter.interpret(
+        "Convert don't panic to uppercase and weather in Toronto",
+        "Convert don't panic to uppercase and weather in Toronto",
+    )
+
+    assert [step.tool_name for step in parsed.steps] == ["TextProcessorTool", "WeatherMockTool"]
+    assert parsed.steps[0].params == {"operation": "uppercase", "text": "don't panic"}
+
+
+def test_interpreter_rejects_three_real_subtasks_even_with_quoted_and():
+    interpreter = TaskInterpreter()
+
+    try:
+        interpreter.interpret(
+            'Convert "a and b" to uppercase and weather in Toronto and calculate 2+2',
+            'Convert "a and b" to uppercase and weather in Toronto and calculate 2+2',
+        )
+    except AppError as error:
+        assert error.error_code == "TASK_TOO_COMPLEX"
+        assert error.message == "Multi-tool execution supports up to 2 subtasks per request."
+    else:
+        raise AssertionError("Expected AppError")
 
 
 def test_interpreter_rejects_more_than_two_subtasks():
@@ -106,6 +188,32 @@ def test_controller_counts_words_for_count_the_word_prompt():
     assert execution.tools_used == ["TextProcessorTool"]
     assert execution.final_output == "1"
     assert execution.output_data == {"operation": "word_count", "input": "test", "result": 1}
+
+
+def test_controller_combines_transaction_and_currency_results():
+    controller = AgentController()
+    execution = controller.execute_task(
+        "Categorize Starbucks transaction 45 CAD and convert to USD",
+        trace_id="trace-finance",
+    )
+
+    assert execution.status == "completed"
+    assert execution.tools_used == ["TransactionCategorizerTool", "CurrencyConverterTool"]
+    assert execution.final_output == "1. Category: dining\n2. 45.00 CAD = 33.33 USD"
+    assert len(execution.output_data["results"]) == 2
+    assert execution.output_data["results"][0]["tool_name"] == "TransactionCategorizerTool"
+    assert execution.output_data["results"][1]["tool_name"] == "CurrencyConverterTool"
+
+
+def test_controller_returns_handled_failure_for_explicit_unsupported_currency_target():
+    controller = AgentController()
+    execution = controller.execute_task("Convert 67 CAD to INR", trace_id="trace-currency-unsupported")
+
+    assert execution.status == "failed"
+    assert execution.tools_used == []
+    assert execution.final_output == "TaskBuddy could not complete this request. Only USD, CAD, GBP, and AUD are supported."
+    assert execution.output_data["issue"]["error_code"] == "CURRENCY_NOT_SUPPORTED"
+    assert execution.output_data["issue"]["details"]["supported_currencies"] == ["USD", "CAD", "GBP", "AUD"]
 
 
 def test_controller_returns_handled_unsupported_turn():

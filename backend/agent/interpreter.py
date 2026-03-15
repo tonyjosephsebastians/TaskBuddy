@@ -7,10 +7,9 @@ from backend.errors import AppError
 from backend.models import ParsedTask, ToolStep
 
 
-CURRENCY_PATTERN = re.compile(r"(?P<amount>\d+(?:\.\d+)?)\s*(?P<currency>USD|CAD|GBP|AUD)\b", re.IGNORECASE)
-TARGET_CURRENCY_PATTERN = re.compile(r"\bto\s+(USD|CAD|GBP|AUD)\b", re.IGNORECASE)
+CURRENCY_PATTERN = re.compile(r"(?P<amount>\d+(?:\.\d+)?)\s*(?P<currency>[A-Z]{3})\b", re.IGNORECASE)
+TARGET_CURRENCY_PATTERN = re.compile(r"\bto\s+([A-Z]{3})\b", re.IGNORECASE)
 QUOTED_TEXT_PATTERN = re.compile(r'"([^"]+)"|\'([^\']+)\'')
-MULTI_TASK_SPLIT_PATTERN = re.compile(r"\s+(?:and|then)\s+", re.IGNORECASE)
 TEXT_CONVERT_PATTERN = re.compile(
     r"(?i)^(?:convert|change|make|turn)\s+(.+?)\s+to\s+(uppercase|upper case|upper|lowercase|lower case|lower|titlecase|title case|title)\b"
 )
@@ -40,6 +39,81 @@ TRANSACTION_KEYWORDS = ("categorize", "category", "transaction", "merchant", "cl
 MULTI_SUBTASK_ERROR = "Multi-tool execution supports up to 2 subtasks per request."
 
 
+def _is_word_character(value: str) -> bool:
+    return value.isalnum() or value == "_"
+
+
+def _is_quote_delimiter(text: str, index: int) -> bool:
+    quote = text[index]
+    if quote == '"':
+        return True
+    if quote != "'":
+        return False
+
+    previous = text[index - 1] if index > 0 else ""
+    following = text[index + 1] if index + 1 < len(text) else ""
+    return not (_is_word_character(previous) and _is_word_character(following))
+
+
+def _consume_subtask_separator(text: str, start: int) -> int | None:
+    if not text[start].isspace():
+        return None
+
+    index = start
+    while index < len(text) and text[index].isspace():
+        index += 1
+
+    for separator in ("and", "then"):
+        end = index + len(separator)
+        if text[index:end].lower() != separator:
+            continue
+        if end >= len(text) or not text[end].isspace():
+            continue
+        while end < len(text) and text[end].isspace():
+            end += 1
+        return end
+    return None
+
+
+def split_subtasks_outside_quotes(text: str) -> list[str]:
+    parts: list[str] = []
+    current: list[str] = []
+    active_quote: str | None = None
+    index = 0
+
+    while index < len(text):
+        character = text[index]
+        if active_quote is not None:
+            current.append(character)
+            if character == active_quote and _is_quote_delimiter(text, index):
+                active_quote = None
+            index += 1
+            continue
+
+        if character in ('"', "'") and _is_quote_delimiter(text, index):
+            active_quote = character
+            current.append(character)
+            index += 1
+            continue
+
+        separator_end = _consume_subtask_separator(text, index)
+        if separator_end is not None:
+            part = "".join(current).strip(" ,?:")
+            if part:
+                parts.append(part)
+            current = []
+            index = separator_end
+            continue
+
+        current.append(character)
+        index += 1
+
+    trailing = "".join(current).strip(" ,?:")
+    if trailing:
+        parts.append(trailing)
+    return parts
+
+
 class TaskInterpreter:
     def interpret(self, original_text: str, sanitized_text: str) -> ParsedTask:
         parsed = ParsedTask(original_text=original_text, sanitized_text=sanitized_text)
@@ -62,12 +136,12 @@ class TaskInterpreter:
                 )
                 return self._finalize(parsed)
 
-        if len(subtasks) == 2 and self._is_transaction_currency_pipeline(subtasks, sanitized_text):
-            transaction_step = self._build_transaction_step(subtasks[0])
+        if self._is_transaction_currency_pipeline(sanitized_text):
+            transaction_step = self._build_transaction_step(sanitized_text)
             currency_step = self._build_currency_step(sanitized_text)
             if transaction_step and currency_step:
                 parsed.steps.extend([transaction_step, currency_step])
-                parsed.output_transform = output_transform
+                parsed.metadata["combine_results"] = True
                 return self._finalize(parsed)
 
         if len(subtasks) == 2:
@@ -98,12 +172,12 @@ class TaskInterpreter:
         return parsed
 
     def _split_subtasks(self, text: str) -> list[str]:
-        parts = [part.strip(" ,?:") for part in MULTI_TASK_SPLIT_PATTERN.split(text) if part.strip(" ,?:")]
+        parts = split_subtasks_outside_quotes(text)
         if len(parts) <= 1:
             return [text]
         if len(parts) > 2:
             return parts
-        if self._is_transaction_currency_pipeline(parts, text):
+        if self._is_transaction_currency_pipeline(text):
             return parts
         if self._extract_output_transform(parts[1].lower()):
             return parts
@@ -123,15 +197,16 @@ class TaskInterpreter:
             )
         )
 
-    def _is_transaction_currency_pipeline(self, subtasks: list[str], full_text: str) -> bool:
-        first_task, second_task = subtasks
-        first_lowered = first_task.lower()
-        second_lowered = second_task.lower()
+    def _is_transaction_currency_pipeline(self, text: str) -> bool:
+        lowered = text.lower()
         return (
-            any(keyword in first_lowered for keyword in TRANSACTION_KEYWORDS)
-            and any(keyword in second_lowered for keyword in ("convert", "exchange", "currency", "usd", "cad", "gbp", "aud"))
-            and CURRENCY_PATTERN.search(full_text) is not None
-            and TARGET_CURRENCY_PATTERN.search(full_text) is not None
+            any(keyword in lowered for keyword in TRANSACTION_KEYWORDS)
+            and (
+                any(keyword in lowered for keyword in ("convert", "exchange", "currency", "rate"))
+                or TARGET_CURRENCY_PATTERN.search(text) is not None
+            )
+            and CURRENCY_PATTERN.search(text) is not None
+            and TARGET_CURRENCY_PATTERN.search(text) is not None
         )
 
     def _build_primary_step(self, text: str) -> ToolStep:
@@ -142,8 +217,8 @@ class TaskInterpreter:
         for builder in (
             self._build_weather_step,
             self._build_calculator_step,
-            self._build_currency_step,
             self._build_transaction_step,
+            self._build_currency_step,
         ):
             step = builder(text)
             if step:
@@ -269,6 +344,8 @@ class TaskInterpreter:
 
     def _build_currency_step(self, text: str) -> ToolStep | None:
         lowered = text.lower()
+        if any(keyword in lowered for keyword in TRANSACTION_KEYWORDS) and not self._is_transaction_currency_pipeline(text):
+            return None
         if not any(keyword in lowered for keyword in ("convert", "exchange", "currency", "rate")) and not CURRENCY_PATTERN.search(text):
             return None
 
@@ -289,6 +366,8 @@ class TaskInterpreter:
         if not any(keyword in lowered for keyword in TRANSACTION_KEYWORDS):
             return None
         description = re.sub(r"(?i)\b(categorize|category|transaction|merchant|classify|classification|spend|spending)\b", "", text).strip(" :,-")
+        description = re.sub(r"(?i)\b(?:and\s+)?(?:convert|exchange)\b.*$", "", description).strip(" :,-")
+        description = " ".join(description.split())
         amount_match = CURRENCY_PATTERN.search(text)
         amount = float(amount_match.group("amount")) if amount_match else None
         return ToolStep("TransactionCategorizerTool", {"description": description, "amount": amount})
