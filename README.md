@@ -1,6 +1,6 @@
 # TaskBuddy
 
-TaskBuddy is a lightweight full-stack coding-challenge submission built around a FastAPI backend, a React frontend served as static assets by FastAPI, deterministic tool routing, SQLite persistence, and a LangGraph-backed orchestration flow.
+TaskBuddy is a lightweight full-stack app built around a FastAPI backend, a React frontend served as static assets by FastAPI, deterministic tool routing, SQLite persistence, and a LangGraph-backed orchestration flow.
 
 The application lets a signed-in user create chat threads, submit task requests, inspect structured execution traces, and review saved task history. The admin page supports local user creation and deletion with lightweight RBAC.
 
