@@ -183,7 +183,7 @@ def build_dashboard(rows: list[dict[str, Any]]) -> str:
         [
             _summary_card("Total tests", total, "Complete backend and frontend validation set"),
             _summary_card("Passed", status_counter.get("passed", 0), "Stable validations currently passing"),
-            _summary_card("Failed", status_counter.get("failed", 0), "Tests that need reviewer attention"),
+            _summary_card("Failed", status_counter.get("failed", 0), "Tests that need attention"),
             _summary_card("Skipped", status_counter.get("skipped", 0), "Cases intentionally or conditionally skipped"),
         ]
     )

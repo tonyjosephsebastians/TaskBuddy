@@ -1,271 +1,256 @@
-# TaskBuddy Technical Design
+# TaskBuddy Technical Documentation
 
 ## Overview
 
-TaskBuddy is a deterministic task workspace with four durable concepts:
+TaskBuddy is a deterministic task workspace built around:
 
-- one authenticated local user session
-- many chat threads per user, capped at `5`
-- many saved task flows per thread, capped at `3`
-- many ordered execution steps per saved turn
+- FastAPI for HTTP APIs and static frontend delivery
+- a React client served from `backend/static`
+- LangGraph for staged orchestration
+- SQLite for local persistence
+- documented, deterministic tool routing
+- a generated documentation pack with screenshots, DOCX files, a PPTX deck, and a demo video
 
-The backend remains FastAPI-first, but orchestration now runs through a LangGraph state graph that wraps the existing validation, planning, tool execution, retry, and response-assembly stages.
+The design favors explainability, reproducibility, and a low-friction local setup. The app intentionally avoids external live data sources for the current toolset.
 
-## Runtime Model
+## Runtime model
 
-- local runtime is a single FastAPI process started with `python app.py`
-- the built React frontend is served from `backend/static`
-- there is no separate frontend runtime process for reviewer usage
-- helper scripts create `.venv`, install dependencies, activate the environment, and start the backend
+| Area | Decision | Purpose |
+| --- | --- | --- |
+| Web server | FastAPI | Single backend entrypoint for APIs and static UI delivery |
+| Frontend delivery | Built React assets served from `backend/static` | No separate frontend runtime is required |
+| Database | SQLite | Simple local persistence with no extra service |
+| Orchestration | LangGraph around deterministic nodes | Explicit execution stages and traceability |
+| Authentication | JWT cookie session | Lightweight local auth without token copy/paste |
+| App runtime dependencies | `requirements.txt` in `.venv` | Keeps the normal runtime isolated |
+| Documentation-pack dependencies | `requirements-review-pack.txt` in `.review-pack-venv` | Keeps DOCX, Playwright, and video tooling away from the app runtime |
 
-## System Architecture
+## Architecture
 
-```mermaid
-flowchart LR
-    UI["React UI"] --> API["FastAPI"]
-    UI --> AUTH["JWT cookie session"]
-    API --> ROUTES["Route handlers"]
-    ROUTES --> CTRL["AgentController facade"]
-    CTRL --> GRAPH["LangGraph state graph"]
-    GRAPH --> SAFETY["SafetyGuard"]
-    GRAPH --> INTERP["TaskInterpreter"]
-    GRAPH --> TOOLS["Tool registry"]
-    ROUTES --> REPO["TaskRepository"]
-    REPO --> DB["SQLite"]
-```
+![Architecture overview](review-pack/diagrams/architecture-overview.png)
 
-### Ownership
+### Ownership model
 
-- React owns browser UI state, history navigation, and streamed pending-turn rendering.
-- FastAPI owns auth, routing, error normalization, and static asset serving.
-- `AgentController` owns the stable API-facing execution contract.
-- LangGraph owns internal state transitions for validation, planning, tool execution, retry scheduling, and response assembly.
-- `TaskRepository` owns SQLite initialization, seeding, persistence, and limit enforcement.
+| Component | Responsibility |
+| --- | --- |
+| React UI | Sign-in flow, route changes, thread history, pending turn rendering, auto-scroll, and admin screen |
+| FastAPI routes | Request validation, auth checks, thread CRUD, synchronous task execution, and SSE streaming |
+| `AgentController` | Stable execution facade exposed to the API layer |
+| LangGraph state graph | Validation, planning, tool execution, retry handling, and response assembly |
+| `TaskInterpreter` | Deterministic prompt parsing, subtask splitting, and tool-step planning |
+| Tool registry | Execution for the five supported tool families |
+| `TaskRepository` | SQLite schema setup, seeding, persistence, limits, and lookups |
 
-## Routing Design
+## Browser and API flow
+
+![Request lifecycle](review-pack/diagrams/request-lifecycle.png)
 
 ### Browser routes
 
-- `/` home workspace without auto-selecting a thread
-- `/threads/:threadId` selected chat
-- `/admin` admin-only management page
+| Route | Purpose | Access |
+| --- | --- | --- |
+| `/` | Workspace home with no thread preselected | Authenticated |
+| `/threads/:threadId` | Selected chat thread | Authenticated |
+| `/admin` | User-management page | Admin only |
 
-### Route behavior
+### API endpoint catalog
 
-- Selecting or creating a chat pushes `/threads/:threadId`.
-- Direct navigation to a valid thread URL loads that thread after authentication.
-- Direct navigation to a missing thread redirects back to `/` and shows a banner.
-- Deleting the current thread routes to the next available thread or back to `/`.
+| Method | Path | Access | Purpose | Request summary | Response summary |
+| --- | --- | --- | --- | --- | --- |
+| `POST` | `/api/v1/auth/login` | Public | Validate credentials and create the session cookie | Username and password | `user_id`, `username`, `role` |
+| `POST` | `/api/v1/auth/logout` | Public | Clear the session cookie | No body required | `{ "status": "ok" }` |
+| `GET` | `/api/v1/auth/me` | Authenticated | Return the signed-in account summary | Cookie session | `user_id`, `username`, `role` |
+| `GET` | `/api/v1/threads` | Authenticated | List thread summaries and optional search results | Optional `search` query | Array of thread summaries |
+| `POST` | `/api/v1/threads` | Authenticated | Create a new empty chat thread | No body required | Thread detail payload |
+| `GET` | `/api/v1/threads/{thread_id}` | Authenticated | Return one thread and its saved turns | Thread id path parameter | Thread detail payload |
+| `DELETE` | `/api/v1/threads/{thread_id}` | Authenticated | Delete a thread owned by the current user | Thread id path parameter | `204 No Content` |
+| `POST` | `/api/v1/threads/{thread_id}/tasks` | Authenticated | Run a task synchronously and persist the completed turn | `task_text` | Saved turn payload |
+| `POST` | `/api/v1/threads/{thread_id}/tasks/stream` | Authenticated | Run a task through SSE and persist the completed turn | `task_text` | SSE `run_started`, `trace_step`, `retry_scheduled`, `completed`, `failed` |
+| `GET` | `/api/v1/admin/users` | Admin only | List local users without passwords | Cookie session | Array of user summaries |
+| `POST` | `/api/v1/admin/users` | Admin only | Create a local user | Username, password, role | User summary |
+| `DELETE` | `/api/v1/admin/users/{user_id}` | Admin only | Delete a local user except the current admin session | User id path parameter | `204 No Content` |
+| `GET` | `/health` | Public | Return basic health status | No body required | `{ "status": "ok" }` |
 
-## LangGraph Orchestration
+### Task-execution endpoints
 
-### Graph nodes
+| Endpoint | Purpose | When to use it |
+| --- | --- | --- |
+| `POST /api/v1/threads/{thread_id}/tasks` | Standard request/response task execution | Simple integrations, direct API testing, and non-streaming clients |
+| `POST /api/v1/threads/{thread_id}/tasks/stream` | Streaming task execution with progressive trace events | Browser UX, live trace visibility, and SSE-oriented demos |
 
-- `validation`
-- `planning`
-- `execute_tool`
-- `issue_response`
-- `response_assembly`
+## LangGraph orchestration
+
+| Node | Responsibility | Output |
+| --- | --- | --- |
+| `validation` | Normalize text, apply safety checks, and reject invalid requests early | Sanitized text and validation trace step |
+| `planning` | Build the deterministic tool plan | One or two tool steps plus planning trace step |
+| `execute_tool` | Run each tool in order, with retry metadata where applicable | Tool result data and execution trace step |
+| `issue_response` | Build a handled failure or unsupported response | User-facing issue payload |
+| `response_assembly` | Build final output, structured payload, tools-used list, and saved turn shape | Completed `TurnExecution` |
 
 ### State carried through the graph
 
-- raw task text
+- original task text
 - sanitized task text
-- parsed execution plan
+- parsed steps
 - current tool index
-- retry counter
-- prior tool summary context
-- collected tool results
-- trace steps
-- final output payload
-- handled issue state
-- completed `TurnExecution`
+- retry metadata
+- prior summary context for chained text and result transforms
+- collected result data
+- ordered trace steps
+- handled issue details
+- final turn payload
 
-### Why LangGraph here
+## Tool catalog
 
-- it makes orchestration stages explicit without changing the deterministic product behavior
-- it preserves the existing REST and SSE response contracts
-- it keeps multi-step routing extensible if more tools are added later
+| Tool | Purpose | Main routing cues | Dependencies | Known limits |
+| --- | --- | --- | --- | --- |
+| `TextProcessorTool` | Case transforms and counts | `convert`, `make`, `title case`, `count words`, `count characters` | Internal string parsing only | Occurrence counting inside larger text is unsupported |
+| `CalculatorTool` | Safe arithmetic evaluation | `calculate`, `what is`, `add`, `minus`, `times`, `divide`, `quotient`, `product` | Internal parser only | Arithmetic only; no variables or functions |
+| `WeatherMockTool` | Deterministic weather summaries | `weather`, `forecast`, `temperature`, `condition`, `humidity` with a supported city | Mock city data from config | Supported cities only |
+| `CurrencyConverterTool` | Fixed-rate currency conversion | `convert`, `exchange`, `currency`, `rate`, explicit amount/currency pairs | Mock exchange-rate table | Only `USD`, `CAD`, `GBP`, and `AUD` are supported |
+| `TransactionCategorizerTool` | Keyword-based category mapping | `categorize`, `classify`, `transaction`, `spend`, `merchant` | Keyword mapping table | Unmatched descriptions fall back to `other` |
 
-### Why not an LLM planner
+### Routing rules worth noting
 
-- the challenge only requires tool selection and execution transparency
-- deterministic routing is easier to test and explain
-- the shipped tools are narrow enough that heuristic routing is sufficient
+- quoted text is protected from false multi-subtask splitting
+- `add 3+2` and `what is 8 minus 3` both route to the calculator
+- `count the word "test"` is treated as a word-count request over the provided text
+- `Categorize Starbucks transaction 45 CAD` stays on the categorizer
+- `Categorize Starbucks transaction 45 CAD and convert to USD` creates a two-tool finance flow
+- `Convert 67 CAD to INR` routes to the converter and returns a handled `CURRENCY_NOT_SUPPORTED` response
 
-## Request Lifecycle
+## Persistence design
 
-```mermaid
-sequenceDiagram
-    participant UI as Browser UI
-    participant API as FastAPI
-    participant Ctrl as AgentController
-    participant Graph as LangGraph
-    participant Repo as TaskRepository
-    participant DB as SQLite
+![Database schema](review-pack/diagrams/database-schema.png)
 
-    UI->>API: POST /threads/{id}/tasks/stream
-    API->>Repo: ensure_thread_flow_capacity(...)
-    API->>Ctrl: execute_task_stream(task_text, trace_id)
-    Ctrl->>Graph: run graph
-    Graph->>Graph: validation
-    API-->>UI: run_started
-    API-->>UI: trace_step(validation)
-    Graph->>Graph: planning
-    API-->>UI: trace_step(planning)
-    Graph->>Graph: tool execution / retry
-    API-->>UI: trace_step(tool execution)
-    API-->>UI: retry_scheduled (if needed)
-    Graph->>Graph: response assembly
-    API-->>UI: trace_step(response assembly)
-    Repo->>DB: save turn + execution steps
-    API-->>UI: completed(thread payload)
-```
+### Persistence behavior
 
-### Sync vs streaming
+| Area | Behavior |
+| --- | --- |
+| User bootstrap | Fresh initialization seeds only `admin` / `admin123` |
+| Thread titles | The first saved task becomes the thread title, trimmed to the configured limit |
+| Turn history | Each saved turn includes task text, final output, output payload, tools used, trace steps, timestamp, and trace ID |
+| Limits | The repository enforces max threads per user, max saved flows per thread, and role capacity |
+| Sensitive handling | Sanitized text is stored when the safety layer changes the original input |
 
-- `POST /tasks` runs the same LangGraph-backed controller flow and returns the final turn.
-- `POST /tasks/stream` wraps that flow in SSE events:
-- `run_started`
-- `trace_step`
-- `retry_scheduled`
-- `completed`
-- `failed`
+## Authentication and session model
 
-## Persistence Design
+| Decision | Why it was chosen |
+| --- | --- |
+| JWT cookie session | Works well for a single FastAPI-served UI without manual token handling |
+| PBKDF2 + salt | Keeps local passwords hashed and non-recoverable |
+| Admin-only user APIs | Protects user creation and deletion behind role checks |
+| Session-only password reveal | Allows visibility for newly created users without persisting recoverable passwords |
 
-```mermaid
-erDiagram
-    users ||--o{ threads : owns
-    threads ||--o{ task_turns : contains
-    task_turns ||--o{ execution_steps : records
+## Validation and limits
 
-    users {
-      TEXT id PK
-      TEXT username
-      TEXT password_hash
-      TEXT password_salt
-      TEXT role
-      TEXT created_at
-    }
+| Limit | Value | Enforcement point |
+| --- | ---: | --- |
+| Request length | `250` characters | Safety guard and UI validation |
+| Subtasks per request | `2` | Interpreter and composer validation |
+| Threads per user | `5` | Repository and UI blocking |
+| Saved task flows per thread | `3` | Repository and composer blocking |
+| Admin accounts | `1` | Repository |
+| Standard user accounts | `2` | Repository |
 
-    threads {
-      TEXT id PK
-      TEXT user_id FK
-      TEXT title
-      TEXT created_at
-      TEXT updated_at
-    }
+## Folder structure
 
-    task_turns {
-      TEXT id PK
-      TEXT thread_id FK
-      TEXT raw_input
-      TEXT sanitized_input
-      TEXT status
-      TEXT final_output
-      TEXT output_data_json
-      TEXT tools_used_json
-      TEXT trace_id
-      TEXT created_at
-    }
+| Path | Purpose |
+| --- | --- |
+| `backend/` | FastAPI app, orchestration, persistence, tools, and schemas |
+| `frontend/` | React source, tests, and Vite config |
+| `docs/` | User guide, technical content, manual test plan, demo script, and generated pack output |
+| `scripts/` | Runtime helpers, report export, and documentation-pack generation |
+| `tests/` | Backend unit and integration coverage plus metadata for export reports |
+| `reports/` | Generated JUnit XML, Excel summaries, and HTML dashboards |
 
-    execution_steps {
-      TEXT id PK
-      TEXT turn_id FK
-      INTEGER step_number
-      TEXT phase
-      TEXT tool_name
-      TEXT status
-      TEXT message
-      TEXT payload_json
-      TEXT created_at
-    }
-```
+![Project layout](review-pack/diagrams/project-layout.png)
 
-### Persistence notes
+## Source-focused file inventory
 
-- thread titles are auto-generated from the first saved task
-- masked numeric content is persisted when sensitive patterns are detected
-- admin seeding creates only the bootstrap admin account on fresh initialization
-- `TaskRepository` rejects:
-- a 6th thread for the same user
-- a 4th saved turn inside the same thread
-- user creation beyond configured role capacity
+### Backend Python files
 
-## Tool Routing
+| File | Purpose |
+| --- | --- |
+| `backend/app.py` | Creates the FastAPI app, registers exception handlers, mounts static assets, and exposes the health route |
+| `backend/config.py` | Central constants, limits, demo data, and paths |
+| `backend/errors.py` | App-specific error classes used for handled API and tool failures |
+| `backend/models.py` | Dataclasses for parsed tasks, tool results, turns, threads, and users |
+| `backend/security.py` | Password hashing, verification, and JWT helpers |
+| `backend/api/routes.py` | REST and SSE endpoints plus auth dependencies |
+| `backend/agent/controller.py` | API-facing execution facade around LangGraph orchestration |
+| `backend/agent/interpreter.py` | Deterministic prompt parsing, subtask splitting, and tool planning |
+| `backend/agent/state_graph.py` | LangGraph state definition and node wiring |
+| `backend/persistence/repository.py` | SQLite schema setup, CRUD, seeding, and limit enforcement |
+| `backend/safety/guard.py` | Input-length checks and sanitization helpers |
+| `backend/schemas/api.py` | Pydantic request and response models |
+| `backend/tools/base.py` | Shared tool contract |
+| `backend/tools/text_processor.py` | Text tool implementation |
+| `backend/tools/calculator.py` | Calculator implementation |
+| `backend/tools/weather_mock.py` | Mock weather implementation |
+| `backend/tools/currency_converter.py` | Currency conversion implementation |
+| `backend/tools/transaction_categorizer.py` | Transaction categorization implementation |
 
-### Current tool families
+### Frontend TypeScript files
 
-- text transformation and counting
-- arithmetic
-- mock weather
-- mock currency conversion
-- transaction categorization
+| File | Purpose |
+| --- | --- |
+| `frontend/src/main.tsx` | React entrypoint |
+| `frontend/src/App.tsx` | Main application shell, route handling, workspace flow, admin page, and composer behavior |
+| `frontend/src/App.test.tsx` | Frontend interaction, routing, and regression tests |
+| `frontend/src/api.ts` | Browser API helpers for auth, threads, tasks, and admin routes |
+| `frontend/src/types.ts` | Shared frontend response and event types |
+| `frontend/src/setupTests.ts` | Vitest and DOM test setup |
+| `frontend/src/components/BrandMark.tsx` | Reusable TaskBuddy mark component |
 
-### Matching strategy
+### Scripts, docs, and tests
 
-- direct text-operation phrases
-- arithmetic symbols and calculator synonyms such as `add`, `plus`, `minus`, `times`, and `divided by`
-- weather synonyms such as `forecast`, `temperature`, `condition`, and `humidity`
-- finance and classification synonyms for currency conversion and transaction categorization
-- guarded multi-subtask splitting so phrases like `add 3 and 2` are treated as one calculator request instead of two subtasks
+| File | Purpose |
+| --- | --- |
+| `app.py` | Root run entrypoint that delegates to `backend.app.run()` |
+| `scripts/run-taskbuddy.ps1` | Windows one-command launcher for the app runtime |
+| `scripts/run-taskbuddy.sh` | Linux, macOS, WSL, or Git Bash launcher for the app runtime |
+| `scripts/build-review-pack.ps1` | Windows builder for the documentation pack with separate environments |
+| `scripts/build-review-pack.sh` | POSIX shell builder for the documentation pack with separate environments |
+| `scripts/generate_review_pack.py` | Screenshot capture, DOCX generation, PPTX generation, and video assembly |
+| `scripts/export_test_results.py` | JUnit-to-Excel and HTML report export |
+| `README.md` | Project overview and runtime instructions |
+| `docs/user-guide.md` | Source content for the user guide DOCX |
+| `docs/manual-test-plan.md` | Source content for the manual test plan DOCX |
+| `docs/demo-script.md` | Source narration for the deck and demo video |
+| `tests/integration/test_api.py` | Backend API integration coverage |
+| `tests/unit/test_agent.py` | Interpreter, controller, and repository coverage |
+| `tests/unit/test_tools.py` | Tool execution unit coverage |
+| `tests/unit/test_safety.py` | Safety-guard coverage |
+| `tests/unit/test_reports.py` | Report-export validation |
 
-## Admin And Security
+## Documentation-pack generation
 
-- roles are `admin` and `user`
-- startup seeds only the bootstrap admin account
-- password storage is PBKDF2 + salt and remains one-way hashed
-- the admin page never receives persisted passwords from the backend
-- password reveal is session-only on the frontend for newly created users
+| Area | Behavior |
+| --- | --- |
+| Runtime isolation | `.venv` uses `requirements.txt` only |
+| Documentation isolation | `.review-pack-venv` uses `requirements-review-pack.txt` only |
+| Screenshot capture | Playwright drives the running app and stores PNGs under `docs/review-pack/screenshots/` |
+| DOCX generation | `python-docx` renders the markdown sources into branded documents |
+| PPTX generation | `python-pptx` builds the widescreen demo deck and speaker notes |
+| Narration | `pyttsx3` runs first, `gTTS` is the fallback, and silent video is the last fallback |
+| Video output | `moviepy` assembles slide images and narration into `TaskBuddy-Demo.mp4` |
 
-## Limits And Validation
+## Testing and reporting
 
-- max request length: `250` characters
-- max subtasks per request: `2`
-- max threads per user: `5`
-- max saved task flows per thread: `3`
-- max admin accounts: `1`
-- max standard user accounts: `2`
+| Area | Coverage |
+| --- | --- |
+| Backend unit tests | Interpreter routing, controller behavior, retry handling, repository limits, and tool behavior |
+| Backend integration tests | Auth, thread CRUD, sync tasks, streaming tasks, and handled failures |
+| Frontend tests | Login flow, route changes, thread limits, task-flow limits, auto-scroll, and admin interactions |
+| Reports | Backend JUnit XML, frontend JUnit XML, Excel summary, HTML dashboard, and the generated documentation pack |
 
-## Runtime And Containerization
+## Design tradeoffs
 
-### Local scripts
-
-- `scripts/run-taskbuddy.ps1`
-- `scripts/run-taskbuddy.sh`
-
-Both scripts:
-- detect Python
-- create `.venv`
-- install `requirements.txt` only when needed
-- activate the environment
-- start `python app.py`
-
-### Containers
-
-- Docker builds the frontend assets in a Node stage and serves them from the Python runtime image.
-- Docker Compose exposes port `8000` and mounts a named volume for `backend/data`.
-
-## Testing Strategy
-
-### Backend
-
-- unit coverage for interpreter routing, controller execution, retry handling, repository limits, and seeding behavior
-- integration coverage for auth, thread CRUD, limit enforcement, sync tasks, and streaming tasks
-
-### Frontend
-
-- authenticated workspace rendering
-- route changes for `/threads/:threadId`
-- invalid thread redirect behavior
-- sidebar thread-limit blocking
-- composer thread-flow blocking
-- admin password reveal for session-created users only
-
-### Reporting
-
-- JUnit XML for backend and frontend
-- Excel export
-- HTML reviewer dashboard
-- normalized coverage labels with `Bonus:` removed from coverage displays
+- FastAPI serves the built frontend to keep local runtime simple.
+- Deterministic tool routing is favored over opaque model reasoning so behavior stays testable and explainable.
+- Mock weather and currency data keep the challenge self-contained and reproducible.
+- SQLite is sufficient for a local workflow and easy artifact sharing.
+- The current React app still concentrates a large amount of UI logic in `App.tsx`; that is a maintainability tradeoff, not a functional blocker.
+- The documentation pack uses a separate environment because presentation tooling should never interfere with the app runtime.

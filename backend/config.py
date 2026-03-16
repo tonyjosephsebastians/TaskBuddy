@@ -23,10 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 BACKEND_DIR = BASE_DIR / "backend"
 STATIC_DIR = BACKEND_DIR / "static"
 DATA_DIR = BACKEND_DIR / "data"
-DATABASE_PATH = DATA_DIR / "taskbuddy.db"
+DATABASE_PATH = Path(os.getenv("TASKBUDDY_DATABASE_PATH", str(DATA_DIR / "taskbuddy.db")))
 
 APP_NAME = "TaskBuddy"
 API_PREFIX = "/api/v1"
+APP_HOST = os.getenv("TASKBUDDY_HOST", "0.0.0.0")
+APP_PORT = _env_int("TASKBUDDY_PORT", 8000)
 MAX_CHARACTERS = 250
 MAX_PLAN_STEPS = 2
 THREAD_TITLE_LIMIT = 48

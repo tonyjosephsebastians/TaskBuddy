@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from backend.agent.controller import AgentController
 from backend.api.routes import router
-from backend.config import API_PREFIX, APP_NAME, STATIC_DIR
+from backend.config import API_PREFIX, APP_HOST, APP_NAME, APP_PORT, STATIC_DIR
 from backend.errors import AppError
 from backend.persistence.repository import TaskRepository
 
@@ -82,4 +82,4 @@ app = create_app()
 
 
 def run() -> None:
-    uvicorn.run("backend.app:app", host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run("backend.app:app", host=APP_HOST, port=APP_PORT, reload=False)
